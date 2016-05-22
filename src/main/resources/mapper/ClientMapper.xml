@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shouyou.ims.dao.ClientDao">
+    <select id="findById" resultType="Client">
+      SELECT c.id,c.name,c.ali_wang,c.wechat,c.phone,c.qq,c.user_id,c.level_id,c.total_money,c.update_date,c.insert_date,
+      l.name as levelName,u2.name as updateUser,u3.name as insertUser,u1.name as userName
+      FROM  clients c LEFT JOIN user u1 ON u1.id = c.user_id
+      LEFT JOIN levels l ON c.level_id = l.id
+      LEFT JOIN users u2 ON c.update_user = u2.id
+      LEFT JOIN users u3 ON c.insert_user = u3.id
+      WHERE id = #{id}
+    </select>
+
+    <select id="findList" resultType="Client">
+        SELECT c.id,c.name,c.ali_wang,c.wechat,c.phone,c.qq,c.user_id,c.level_id,c.total_money,c.status,c.update_date,c.insert_date,
+        l.name as levelName,u2.name as updateUser,u3.name as insertUser,u1.name as userName
+        FROM  clients c LEFT JOIN user u1 ON u1.id = c.user_id
+        LEFT JOIN levels l ON c.level_id = l.id
+        LEFT JOIN users u2 ON c.update_user = u2.id
+        LEFT JOIN users u3 ON c.insert_user = u3.id
+        <where>
+           1=1
+            <if test="name!=null">
+                AND c.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="aliWang!=null">
+                AND c.ali_wang LIKE CONCAT('%',#{aliWang},'%')
+            </if>
+            <if test="wechat!=null">
+                AND c.wechat LIKE CONCAT('%',#{wechat},'%')
+            </if>
+            <if test="phone!=null">
+                AND c.phone LIKE CONCAT('%',#{phone},'%')
+            </if>
+            <if test="qq!=null">
+                AND c.qq LIKE CONCAT('%',#{qq},'%')
+            </if>
+            <if test="userId!=null">
+                AND c.userId = #{userId}
+            </if>
+            <if test="levelId!=null">
+                AND c.level_id = #{levelId}
+            </if>
+            <if test="totalMoney!=null">
+                AND c.total_money = #{totalMoney}
+            </if>
+        </where>
+    </select>
+    
+    <select id="findRepeat">
+        SELECT c.id,c.name,c.ali_wang,c.wechat,c.phone,c.qq,c.user_id,c.level_id,c.total_money,c.status,c.update_date,c.insert_date,
+        l.name as levelName,u2.name as updateUser,u3.name as insertUser,u1.name as userName
+        FROM  clients c LEFT JOIN user u1 ON u1.id = c.user_id
+        LEFT JOIN levels l ON c.level_id = l.id
+        LEFT JOIN users u2 ON c.update_user = u2.id
+        LEFT JOIN users u3 ON c.insert_user = u3.id
+        WHERE
+        1=1 AND (1=2
+            <if test="aliWang!=null">
+                OR c.ali_wang = #{aliWang}
+            </if>
+            <if test="wechat!=null">
+                OR c.wechat = #{wechat}
+            </if>
+            <if test="phone!=null">
+                OR c.phone = #{phone}
+            </if>
+            <if test="qq!=null">
+                OR c.qq = #{qq}
+            </if>
+        )
+    </select>
+
+    <insert id="insert">
+        INSERT INTO clients
+        (
+          id,name,ali_wang,wechat,phone,qq,user_id,level_id,total_money,status,update_date,insert_date,update_user,insert_user
+        )
+        VALUES
+        (
+          #{id},#{name},#{aliWang},#{wechat},#{phone},#{qq},#{userId},#{levelId},#{totalMoney},#{status},#{updateDate},#{insertDate},#{updateUser},#{insertUser}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE clients SET
+          name = #{name},
+          ali_wang = #{aliWang},
+          wechat = #{wechat},
+          phone = #{phone},
+          qq = #{qq},
+          user_id = #{userId},
+          level_id = #{levelId},
+          total_money = #{totalMoney},
+          status = #{status},
+          update_date = #{updateDate},
+          insert_date = #{insertDate},
+          update_user = #{updateUser},
+          insert_user = #{insertUser}
+          WHERE id = #{id}
+    </update>
+</mapper>

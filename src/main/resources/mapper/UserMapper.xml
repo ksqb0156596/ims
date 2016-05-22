@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.shouyou.ims.dao.UserDao">
+    <select id="findById" resultType="User">
+        SELECT id,name,role,status,update_date as updateDate,insert_date as insertDate
+        FROM users
+        WHERE id=#{id}
+    </select>
+    <select id="findList" resultType="User">
+        SELECT id,name,role,status,update_date as updateDate,insert_date as insertDate
+        FROM users
+        <where>
+            1=1
+            <if test="status!=-1">
+              AND  status = #{status}
+            </if>
+            <if test="name!=null">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="role!=-1">
+                AND role = #{role}
+            </if>
+        </where>
+    </select>
+    <insert id="insert">
+        INSERT INTO users (id,name,role,status,update_date,insert_date,update_user,insert_user)
+        VALUES (#{id},#{name},#{password},#{role},#{status},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+    </insert>
+    <update id="update">
+        UPDATE users SET
+            password = #{password},
+            role = #{role},
+            remark = #{remark},
+            update_date = #{updateDate},
+            update_user = #{updateUser}
+        WHERE id = #{id}
+    </update>
+    <update id="delete">
+        UPDATE users SET
+          status = #{status}
+          WHERE id = #{id}
+    </update>
+
+</mapper>

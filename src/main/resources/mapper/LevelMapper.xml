@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shouyou.ims.dao.LevelDao">
+    <select id="findById" resultType="Level">
+        SELECT l.id,l.min_amount,l.max_amount,l.name,l.update_date,l.insert_date,u1.name as updateUser,u2.name as insertUser
+        FROM levels l
+        LEFT JOIN users u1 on l.update_user = u1.id
+        LEFT JOIN users u2 on l.insert_user = u2.id
+        WHERE l.id = #{id}
+    </select>
+    <select id="findList" resultType="Level">
+        SELECT l.id,l.min_amount,l.max_amount,l.name,l.update_date,l.insert_date,u1.name as updateUser,u2.name as insertUser
+        FROM levels l
+        LEFT JOIN users u1 on l.update_user = u1.id
+        LEFT JOIN users u2 on l.insert_user = u2.id
+    </select>
+    <insert id="insert">
+        INSERT INTO levels
+        (name,min_amount,max_amount,update_date,insert_date,update_user,insert_user)
+        VALUES
+        (#{name},#{minAmount},#{maxAmount},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+    </insert>
+    <update id="update">
+        UPDATE levels SET
+        name = #{name},
+        min_amount = #{minAmount},
+        max_amount = #{maxAmount},
+        update_date = #{updateDate},
+        insert_date = #{insertDate},
+        update_user = #{updateUser},
+        insert_user = #{insertUser}
+        WHERE id = #{id}
+    </update>
+    <delete id="delete">
+        DELETE FROM levels WHERE id = #{id}
+    </delete>
+</mapper>

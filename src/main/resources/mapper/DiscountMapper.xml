@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shouyou.ims.dao.DiscountDao">
+    <select id="findById" resultType="Discount">
+        SELECT d.platform_id,d.game_id,d.point,d.status,d.update_date,d.insert_date,p.name as platformName,g.name as gameName,
+        u1.name as updateUser,u2.name as insertUser
+        FROM discount d LEFT JOIN gaming_platform p ON d.platform_id = p.id
+        LEFT JOIN game g ON g.id = d.game_id
+        LEFT JOIN users u1 on d.update_user = u1.id
+        LEFT JOIN users u2 on d.insert_user = u2.id
+        WHERE d.platform_id = #{platformId} AND d.game_id = #{gameId}
+    </select>
+
+    <select id="findList" resultType="Discount">
+        SELECT d.platform_id,d.game_id,d.point,d.status,d.update_date,d.insert_date,p.name as platformName,g.name as gameName,
+        u1.name as updateUser,u2.name as insertUser
+        FROM discount d LEFT JOIN gaming_platform p ON d.platform_id = p.id
+        LEFT JOIN game g ON g.id = d.game_id
+        LEFT JOIN users u1 on d.update_user = u1.id
+        LEFT JOIN users u2 on d.insert_user = u2.id
+        <where>
+            <if test="platformId != null">
+                d.platform_id = #{platformId}
+            </if>
+            <if test="gameId != null">
+                d.gamg_id = #{gameId}
+            </if>
+            <if test="status!=-1">
+                d,status = #{status}
+            </if>
+        </where>
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO discount
+        (platform_id,game_id,point,status,update_date,insert_date,update_user,insert_user)VALUES
+        (#{platformId},#{gameId},#{point},#{status},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+    </insert>
+
+    <update id="update">
+        UPDATE discount SET
+        point = #{point},
+        update_date = #{updateDate},
+        update_user = #{updateUser}
+          WHERE platform_id = #{platformId} AND game_id = #{gameId}
+    </update>
+
+    <update id="delete">
+        UPDATE discount SET
+        status = #{status},
+        update_date = #{updateDate},
+        update_user = #{updateUser}
+          WHERE platform_id = #{platformId} AND game_id = #{gameId}
+    </update>
+</mapper>

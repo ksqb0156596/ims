@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shouyou.ims.dao.AccountDao">
+    <select id="findById" resultType="Account">
+        SELECT a.id,a.name,a.passowrd,a.client_id,a.platform_id,a.status,a.remark,a.update_date,a.insert_date,
+        c.name as clientName,g.name as platformName,u1.name as updateUser,u2.name as insertUser
+        FROM accounts a
+        LEFT JOIN clients c ON a.client_id = c.id
+        LEFT JOIN gaming_platform g ON g.id = c.platform_id
+        LEFT JOIN users u1 on a.update_user = u1.id
+        LEFT JOIN users u2 on a.insert_user = u2.id
+        WHERE id = #{id}
+    </select>
+
+    <select id="findList" resultType="Account">
+        SELECT a.id,a.name,a.passowrd,a.client_id,a.platform_id,a.status,a.remark,a.update_date,a.insert_date,
+        c.name as clientName,g.name as platformName,u1.name as updateUser,u2.name as insertUser
+        FROM accounts a
+        LEFT JOIN clients c ON a.client_id = c.id
+        LEFT JOIN gaming_platform g ON g.id = c.platform_id
+        LEFT JOIN users u1 on a.update_user = u1.id
+        LEFT JOIN users u2 on a.insert_user = u2.id
+        <where>
+            1=1
+            <if test="name!=null">
+               AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="clientId!=null">
+                AND client_id = #{clientId}
+            </if>
+            <if test="platformId!=null">
+                AND platform_id = #{platformId}
+            </if>
+            <if test="clientName!=null">
+                AND c.name LIKE CONCAT('%',#{clientName},'%'}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO accounts
+        (id,name,password,client_id,platform_id,status,remark,update_date,insert_date,update_user,insert_user)
+        VALUES
+        (#{id},#{name},#{password},#{clientId},#{platformId},#{status},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+    </insert>
+
+    <update id="update">
+        UPDATE accounts SET
+            name = #{name},
+            password = #{password},
+            client_id = #{clientId},
+            platfrom_id = #{platformId},
+            status = #{status},
+            update_date = #{updateDate},
+            update_user = #{updateUser}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        UPDATE accounts SET
+          status = #{status},
+          update_date = #{updateDate},
+          update_user = #{updateUser}
+          WHERE id = #{id}
+    </delete>
+</mapper>

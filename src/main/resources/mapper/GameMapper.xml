@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shouyou.ims.dao.GameDao">
+    <select id="findById" resultType="Game">
+        SELECT tr.id,tr.name,tr.status,tr.remark,tr.update_date,tr.insert_date,
+        u1.name as updateUser,u2.name as insertUser
+        FROM game tr LEFT JOIN users u1 on tr.update_user = u1.id
+        LEFT JOIN users u2 on tr.insert_user = u2.id
+        WHERE id = #{id}
+    </select>
+
+    <select id="findById" resultType="Game">
+        SELECT tr.id,tr.name,tr.status,tr.remark,tr.update_date as updateDate,tr.insert_date as insertDate,
+        u1.name as updateUser,u2.name as insertUser
+        FROM game tr LEFT JOIN users u1 on tr.update_user = u1.id
+        LEFT JOIN users u2 on tr.insert_user = u2.id
+        <where>
+            1=1
+            <if test="status!=-1">
+                AND tr.status = #{status}
+            </if>
+            <if test="name!=null">
+                AND tr.name LIKE CONCAT('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO game (name,status,remark,update_date,insert_date,update_user,insert_user)
+        VALUES (#{name},#{status},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+    </insert>
+
+    <update id="update">
+        UPDATE game SET
+        name = #{name},
+        remark = #{remark},
+        update_date = #{updateDate},
+        update_user = #{updateUser}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE game SET
+        status = #{status}
+        WHERE id = #{id}
+    </update>
+</mapper>
