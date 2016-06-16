@@ -11,6 +11,13 @@
     <typeAliases>
         <package name="com.shouyou.ims.entity"/>
     </typeAliases>
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+            <property name="dialect" value="mysql"/>
+            <property name="pageSizeZero" value="true"/>
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>
     <mappers>
         <mapper resource="mapper/*.xml"/>
     </mappers>
