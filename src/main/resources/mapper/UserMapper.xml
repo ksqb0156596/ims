@@ -3,39 +3,176 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="com.shouyou.ims.dao.UserDao">
+
+    <sql id="Base_Column_List">
+        id, name, username, password, wechat, qq, phone, status, update_date, insert_date,
+        update_user, insert_user, remark
+    </sql>
+
     <select id="findById" resultType="User">
-        SELECT id,name,role,status,update_date as updateDate,insert_date as insertDate
-        FROM users
-        WHERE id=#{id}
+        select
+        <include refid="Base_Column_List" />
+        from users
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findByUserAndPwd" resultType="User">
+        select
+        <include refid="Base_Column_List" />
+        from users
+        where username = #{username} and password = #{password}
     </select>
     <select id="findList" resultType="User">
-        SELECT id,name,role,status,update_date as updateDate,insert_date as insertDate
+        SELECT <include refid="Base_Column_List" />
         FROM users
         <where>
-            1=1
-            <if test="status!=-1">
-              AND  status = #{status}
-            </if>
+            status = 1
             <if test="name!=null">
                 AND name LIKE CONCAT('%',#{name},'%')
             </if>
-            <if test="role!=-1">
-                AND role = #{role}
-            </if>
         </where>
     </select>
+
+    <select id="findRoleUsers" resultType="java.lang.Integer">
+        SELECT DISTINCT role_id
+        FROM role_users
+        WHERE users_id = #{id}
+    </select>
+
+    <insert id="insertRoleUser">
+        insert into role_users
+        (
+          role_id,
+          users_id
+        )
+        VALUES
+        <foreach collection="list" item="item" separator="," >
+            (#{item},#{userId})
+        </foreach>
+    </insert>
     <insert id="insert">
-        INSERT INTO users (id,name,role,status,update_date,insert_date,update_user,insert_user)
-        VALUES (#{id},#{name},#{password},#{role},#{status},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+        insert into users
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="wechat != null">
+                wechat,
+            </if>
+            <if test="qq != null">
+                qq,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+            <if test="insertDate != null">
+                insert_date,
+            </if>
+            <if test="updateUser != null">
+                update_user,
+            </if>
+            <if test="insertUser != null">
+                insert_user,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="wechat != null">
+                #{wechat,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null">
+                #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertDate != null">
+                #{insertDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="insertUser != null">
+                #{insertUser,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
     </insert>
     <update id="update">
-        UPDATE users SET
-            password = #{password},
-            role = #{role},
-            remark = #{remark},
-            update_date = #{updateDate},
-            update_user = #{updateUser}
-        WHERE id = #{id}
+        update users
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="wechat != null">
+                wechat = #{wechat,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null">
+                qq = #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertDate != null">
+                insert_date = #{insertDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="insertUser != null">
+                insert_user = #{insertUser,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
     </update>
     <update id="delete">
         UPDATE users SET
@@ -43,4 +180,17 @@
           WHERE id = #{id}
     </update>
 
+    <delete id="deleteMul">
+        UPDATE users SET status = 0,update_user = #{userId}
+        WHERE
+        id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteUserRoles">
+        DELETE FROM role_users
+        WHERE users_id = #{userId}
+    </delete>
 </mapper>

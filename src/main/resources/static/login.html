@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手游管理系统</title>
+    <script type="text/javascript" src="login/js/jquery-1.9.0.min.js"></script>
+    <link href="login/css/login2.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>手游管理系统登录<sup>V1.0.0</sup></h1>
+    <div class="login" style="margin-top:50px;">
+        <div class="web_qr_login" id="web_qr_login" style="display: block; height: 235px;">
+            <div style="display: none;color:red;font-size: 16px;width: 100%;position: relative;text-align: center" id="msg">
+
+            </div>
+            <!--登录-->
+            <div class="web_login" id="web_login">
+
+
+                <div class="login-box">
+
+
+                    <div class="login_form">
+                        <form onsubmit="return false;" name="loginform" accept-charset="utf-8" id="login_form" class="loginForm">
+                            <input type="hidden" name="did" value="0"/>
+                            <input type="hidden" name="to" value="log"/>
+                            <div class="uinArea" id="uinArea">
+                                <label class="input-tips" for="username">帐号：</label>
+                                <div class="inputOuter" id="uArea">
+                                    <input type="text" id="username" name="username" class="inputstyle" value=""/>
+                                </div>
+                            </div>
+                            <div class="pwdArea" id="pwdArea">
+                                <label class="input-tips" for="password">密码：</label>
+                                <div class="inputOuter" id="pArea">
+                                    <input type="password" id="password" name="password" class="inputstyle" value=""/>
+                                </div>
+                            </div>
+
+                            <div style="padding-left:50px;margin-top:20px;"><input type="submit" value="登 录" style="width:150px;" class="button_blue"/></div>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+            <!--登录end-->
+        </div>
+    </div>
+    <div class="jianyi">*推荐使用ie8或以上版本ie浏览器或Chrome内核浏览器访问本站</div>
+    <script>
+        $(function () {
+            $(".button_blue").click(function () {
+                var username = $("#username").val();
+                var password = $("#password").val();
+                if(username.trim().length == 0){
+                    $("#msg").html("用户名不能为空");
+                    $("#msg").show(100);
+                    return false;
+                }
+                if(password.trim().length == 0){
+                    $("#msg").html("密码不能为空");
+                    $("#msg").show(100);
+                    return false;
+                }
+                $.ajax({
+                    url : '/login/login',
+                    method : 'POST',
+                    data : {username:username,password:password},
+                    success : function (data) {
+                        if(data.status == 0){
+                            $("#msg").html(data.msg);
+                            $("#msg").show(100);
+                        }else{
+                            $("#msg").hide();
+                            var user = data.result;
+                            document.cookie = "userId=" + escape(user.id);
+                            document.cookie = "username=" + escape(user.name);
+                            window.location.href = "/";
+                        }
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+</html>

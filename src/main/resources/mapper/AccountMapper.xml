@@ -4,46 +4,81 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shouyou.ims.dao.AccountDao">
     <select id="findById" resultType="Account">
-        SELECT a.id,a.name,a.passowrd,a.client_id,a.platform_id,a.status,a.remark,a.update_date,a.insert_date,
-        c.name as clientName,g.name as platformName,u1.name as updateUser,u2.name as insertUser
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,
+        c.name as clientName,g.name as platformName,gm.name as gameName,u1.name as updateUser,u2.name as insertUser
         FROM accounts a
         LEFT JOIN clients c ON a.client_id = c.id
-        LEFT JOIN gaming_platform g ON g.id = c.platform_id
+        LEFT JOIN game gm ON gm.id = a.game_id
+        LEFT JOIN game_platform g ON g.id = a.platform_id
         LEFT JOIN users u1 on a.update_user = u1.id
         LEFT JOIN users u2 on a.insert_user = u2.id
-        WHERE id = #{id}
+        WHERE a.id = #{id}
     </select>
 
     <select id="findList" resultType="Account">
-        SELECT a.id,a.name,a.passowrd,a.client_id,a.platform_id,a.status,a.remark,a.update_date,a.insert_date,
-        c.name as clientName,g.name as platformName,u1.name as updateUser,u2.name as insertUser
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,a.update_date,a.insert_date,
+        c.name as clientName,g.name as platformName,gm.name as gameName,u1.name as updateUser,u2.name as insertUser
         FROM accounts a
         LEFT JOIN clients c ON a.client_id = c.id
-        LEFT JOIN gaming_platform g ON g.id = c.platform_id
+        LEFT JOIN game gm ON gm.id = a.game_id
+        LEFT JOIN game_platform g ON g.id = a.platform_id
         LEFT JOIN users u1 on a.update_user = u1.id
         LEFT JOIN users u2 on a.insert_user = u2.id
         <where>
-            1=1
+            a.status = 1
             <if test="name!=null">
-               AND name LIKE CONCAT('%',#{name},'%')
-            </if>
-            <if test="clientId!=null">
-                AND client_id = #{clientId}
-            </if>
-            <if test="platformId!=null">
-                AND platform_id = #{platformId}
+               AND a.name = #{name}
             </if>
             <if test="clientName!=null">
-                AND c.name LIKE CONCAT('%',#{clientName},'%'}
+                AND c.name = #{clientName}
             </if>
+            <if test="gameName!=null">
+                AND gm.name = #{gameName}
+            </if>
+            <if test="platformName!=null">
+                AND g.name = #{platformName}
+            </if>
+        </where>
+    </select>
+
+    <select id="findListByInfo" resultType="Account">
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,
+        c.name as clientName,g.name as platformName,gm.name as gameName
+        FROM accounts a
+        LEFT JOIN clients c ON a.client_id = c.id
+        LEFT JOIN game gm ON gm.id = a.game_id
+        LEFT JOIN game_platform g ON g.id = a.platform_id
+        <where>
+            a.status = 1
+            <choose>
+                <when test="clientId != null">
+                    AND a.client_id= #{clientId}
+                </when>
+                <otherwise>
+                    AND a.client_id is NULL
+                </otherwise>
+            </choose>
+                AND a.game_id = #{gameId}
+                AND a.platform_id = #{platformId}
+        </where>
+    </select>
+
+    <select id="findAccount" resultType="Account">
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark
+        FROM accounts a
+        <where>
+            a.status = 1
+            AND a.name = #{name}
+            AND a.game_id = #{gameId}
+            AND a.platform_id = #{platformId}
         </where>
     </select>
 
     <insert id="insert">
         INSERT INTO accounts
-        (id,name,password,client_id,platform_id,status,remark,update_date,insert_date,update_user,insert_user)
+        (id,name,password,client_id,game_id,platform_id,remark,update_date,insert_date,update_user,insert_user)
         VALUES
-        (#{id},#{name},#{password},#{clientId},#{platformId},#{status},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+        (#{id},#{name},#{password},#{clientId},#{gameId},#{platformId},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
     </insert>
 
     <update id="update">
@@ -51,8 +86,8 @@
             name = #{name},
             password = #{password},
             client_id = #{clientId},
-            platfrom_id = #{platformId},
-            status = #{status},
+            platform_id = #{platformId},
+            game_id = #{gameId},
             update_date = #{updateDate},
             update_user = #{updateUser}
         WHERE id = #{id}
@@ -60,9 +95,17 @@
 
     <delete id="delete">
         UPDATE accounts SET
-          status = #{status},
-          update_date = #{updateDate},
-          update_user = #{updateUser}
+          status = 0
           WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteMul">
+        UPDATE accounts SET
+        status = 0,
+        update_user = #{userId}
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </delete>
 </mapper>

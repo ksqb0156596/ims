@@ -3,55 +3,64 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shouyou.ims.dao.DiscountDao">
-    <select id="findById" resultType="Discount">
-        SELECT d.platform_id,d.game_id,d.point,d.status,d.update_date,d.insert_date,p.name as platformName,g.name as gameName,
-        u1.name as updateUser,u2.name as insertUser
-        FROM discount d LEFT JOIN gaming_platform p ON d.platform_id = p.id
-        LEFT JOIN game g ON g.id = d.game_id
-        LEFT JOIN users u1 on d.update_user = u1.id
-        LEFT JOIN users u2 on d.insert_user = u2.id
-        WHERE d.platform_id = #{platformId} AND d.game_id = #{gameId}
+    <select id="queryDiscount" resultType="Discount">
+        SELECT d.id,d.platform_id,d.game_id,d.point,d.real_point,d.status,d.recharge_type
+        FROM discount d
+        WHERE d.platform_id = #{platformId} AND d.game_id = #{gameId} AND d.recharge_type =#{rechargeType} AND d.status = 1
     </select>
 
     <select id="findList" resultType="Discount">
-        SELECT d.platform_id,d.game_id,d.point,d.status,d.update_date,d.insert_date,p.name as platformName,g.name as gameName,
+        SELECT d.id,d.platform_id,d.game_id,d.point,d.real_point,d.recharge_type,d.status,d.update_date,d.insert_date,p.name as platformName,g.name as gameName,
         u1.name as updateUser,u2.name as insertUser
-        FROM discount d LEFT JOIN gaming_platform p ON d.platform_id = p.id
+        FROM discount d LEFT JOIN game_platform p ON d.platform_id = p.id
         LEFT JOIN game g ON g.id = d.game_id
         LEFT JOIN users u1 on d.update_user = u1.id
         LEFT JOIN users u2 on d.insert_user = u2.id
         <where>
+            d.status = 1
             <if test="platformId != null">
-                d.platform_id = #{platformId}
+                AND d.platform_id = #{platformId}
             </if>
             <if test="gameId != null">
-                d.gamg_id = #{gameId}
+                AND d.gamg_id = #{gameId}
             </if>
-            <if test="status!=-1">
-                d,status = #{status}
+            <if test="rechargeType != null">
+                AND d.recharge_type = #{rechargeType}
             </if>
+
         </where>
     </select>
     
     <insert id="insert">
         INSERT INTO discount
-        (platform_id,game_id,point,status,update_date,insert_date,update_user,insert_user)VALUES
-        (#{platformId},#{gameId},#{point},#{status},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+        (platform_id,game_id,point,real_point,recharge_type,update_date,insert_date,update_user,insert_user)VALUES
+        (#{platformId},#{gameId},#{point},#{realPoint},#{rechargeType},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
     </insert>
 
     <update id="update">
         UPDATE discount SET
+        platform_id = #{platformId},
+        game_id = #{gameId},
         point = #{point},
+        real_point = #{realPoint},
+        recharge_type = #{rechargeType},
         update_date = #{updateDate},
         update_user = #{updateUser}
-          WHERE platform_id = #{platformId} AND game_id = #{gameId}
+          WHERE platform_id = #{platformId} AND game_id = #{gameId} AND recharge_type = #{rechargeType} AND status=1
     </update>
 
-    <update id="delete">
+    <delete id="delete">
         UPDATE discount SET
-        status = #{status},
-        update_date = #{updateDate},
-        update_user = #{updateUser}
-          WHERE platform_id = #{platformId} AND game_id = #{gameId}
-    </update>
+        status = 0
+          WHERE id=#{id}
+    </delete>
+
+    <delete id="deleteMul">
+        UPDATE discount SET
+        status = 0,update_user = #{userId}
+        WHERE id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

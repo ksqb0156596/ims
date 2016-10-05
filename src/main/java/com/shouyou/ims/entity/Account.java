@@ -2,15 +2,19 @@ package com.shouyou.ims.entity;
 
 import com.shouyou.ims.commons.BaseEntity;
 
+import java.io.Serializable;
+
 /**
  * Created by makun on 2016/5/24.
  */
-public class Account extends BaseEntity {
+public class Account extends BaseEntity implements Serializable {
     private String name;
-    private String passowrd;
+    private String password;
     private String clientId;
     private String platformId;
+    private String gameId;
     private int status;
+    private String gameName;
     private String clientName;
     private String platformName;
 
@@ -22,13 +26,6 @@ public class Account extends BaseEntity {
         this.name = name;
     }
 
-    public String getPassowrd() {
-        return passowrd;
-    }
-
-    public void setPassowrd(String passowrd) {
-        this.passowrd = passowrd;
-    }
 
     public String getClientId() {
         return clientId;
@@ -68,5 +65,29 @@ public class Account extends BaseEntity {
 
     public void setPlatformName(String platformName) {
         this.platformName = platformName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
     }
 }

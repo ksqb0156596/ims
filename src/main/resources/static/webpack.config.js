@@ -19,10 +19,14 @@ module.exports = {
     //配置加载器,配置每个文件类型的处理方式，这里使用react的jsx
     module:{
         loaders:[
+
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                loader:'babel-loader'
+                loader:'babel-loader',
+                query: {
+                    presets: ['es2015', 'react']
+                }
             },
             {
                 test: /\.css/,

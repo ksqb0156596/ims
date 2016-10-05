@@ -18,6 +18,7 @@ public class BaseEntity {
     private int pageNum;
     private int pageSize;
 
+
     public int getPageNum() {
         return pageNum;
     }
@@ -37,13 +38,13 @@ public class BaseEntity {
     public void preInsert(){
         this.insertDate = new Date();
         this.updateDate = new Date();
-        this.insertUser = UserUtils.getUesr();
-        this.updateUser = UserUtils.getUesr();
+        this.insertUser = UserUtils.getUser().getId();
+        this.updateUser = UserUtils.getUser().getId();
         this.id = UUID.randomUUID().toString();
     }
 
     public void preUpdate(){
-        this.updateUser = UserUtils.getUesr();
+        this.updateUser = UserUtils.getUser().getId();
         this.updateDate = new Date();
     }
 

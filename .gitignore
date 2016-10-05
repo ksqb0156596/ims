@@ -1,4 +1,5 @@
 yi### Maven template
+logs/
 target/
 pom.xml.tag
 pom.xml.releaseBackup

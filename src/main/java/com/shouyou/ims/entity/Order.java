@@ -4,36 +4,137 @@ import com.shouyou.ims.commons.BaseEntity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Created by makun on 2016/5/24.
  */
 public class Order extends BaseEntity implements Serializable {
 
-    private String orderNumber;
+    private String orderNo;
     private String clientId;
     private String gameId;
     private String platformId;
     private String accountId;
     private String payId;
     private String tradingId;
-    private int status;
+    private String directorId;
+    private Integer status;
     private BigDecimal productionPrice;
     private BigDecimal tradingPrice;
-    private int rechargeType;
+    private BigDecimal discount;
+    private BigDecimal profit;
+    private BigDecimal point;
+    private BigDecimal realPoint;
+    private Integer rechargeType;
     private String clientName;
+    private String clientBelong;
+    private String clientBelongId;
     private String gameName;
     private String platformName;
     private String accountName;
+    private String directorName;
     private String payName;
-    private String tradingName;
 
-    public String getOrderNumber() {
-        return orderNumber;
+    private String tradingName;
+    private String denomination;
+    private String levelName;
+    private String accountPwd;
+
+    public String getAccountPwd() {
+        return accountPwd;
     }
 
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
+    public void setAccountPwd(String accountPwd) {
+        this.accountPwd = accountPwd;
+    }
+
+    public BigDecimal getPoint() {
+        return point;
+    }
+
+    public void setPoint(BigDecimal point) {
+        this.point = point;
+    }
+
+    public BigDecimal getRealPoint() {
+        return realPoint;
+    }
+
+    public void setRealPoint(BigDecimal realPoint) {
+        this.realPoint = realPoint;
+    }
+
+    public String getClientBelongId() {
+        return clientBelongId;
+    }
+
+    public void setClientBelongId(String clientBelongId) {
+        this.clientBelongId = clientBelongId;
+    }
+
+    public String getDirectorId() {
+        return directorId;
+    }
+
+    public void setDirectorId(String directorId) {
+        this.directorId = directorId;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
+
+    public BigDecimal getProfit() {
+        return profit;
+    }
+
+    public void setProfit(BigDecimal profit) {
+        this.profit = profit;
+    }
+
+    public String getClientBelong() {
+        return clientBelong;
+    }
+
+    public void setClientBelong(String clientBelong) {
+        this.clientBelong = clientBelong;
+    }
+
+    public String getDirectorName() {
+        return directorName;
+    }
+
+    public void setDirectorName(String directorName) {
+        this.directorName = directorName;
+    }
+
+    public String getLevelName() {
+        return levelName;
+    }
+
+    public void setLevelName(String levelName) {
+        this.levelName = levelName;
+    }
+
+    public String getDenomination() {
+        return denomination;
+    }
+
+    public void setDenomination(String denomination) {
+        this.denomination = denomination;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
     }
 
     public String getClientId() {
@@ -84,11 +185,11 @@ public class Order extends BaseEntity implements Serializable {
         this.tradingId = tradingId;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -108,11 +209,11 @@ public class Order extends BaseEntity implements Serializable {
         this.tradingPrice = tradingPrice;
     }
 
-    public int getRechargeType() {
+    public Integer getRechargeType() {
         return rechargeType;
     }
 
-    public void setRechargeType(int rechargeType) {
+    public void setRechargeType(Integer rechargeType) {
         this.rechargeType = rechargeType;
     }
 

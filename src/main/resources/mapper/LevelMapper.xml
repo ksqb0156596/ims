@@ -15,6 +15,16 @@
         FROM levels l
         LEFT JOIN users u1 on l.update_user = u1.id
         LEFT JOIN users u2 on l.insert_user = u2.id
+        <where>
+            <if test="name != null">
+                name = #{name}
+            </if>
+        </where>
+    </select>
+    <select id="queryLevel" resultType="java.lang.String">
+        SELECT id
+        FROM levels
+        WHERE min_amount &lt; #{amount} AND max_amount &gt; #{amount}
     </select>
     <insert id="insert">
         INSERT INTO levels

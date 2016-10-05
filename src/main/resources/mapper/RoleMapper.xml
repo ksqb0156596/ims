@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shouyou.ims.dao.RoleDao">
+    <select id="findList" resultType="role">
+        SELECT id,name FROM role
+        <where>
+            status = 1
+            <if test="name!=null and name!=''">
+               AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" resultType="role">
+        SELECT id,name FROM role WHERE id = #{id}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO role (name) VALUES (#{name})
+    </insert>
+
+    <update id="update">
+        UPDATE role SET name=#{name} WHERE id=#{id}
+    </update>
+
+    <delete id="delete">
+        UPDATE role SET status = 0 WHERE id = #{id}
+    </delete>
+
+
+    <insert id="insertRoleResource">
+        INSERT INTO role_resource (role_id,resource_id) VALUES (#{roleId},#{resouceId})
+    </insert>
+
+    <insert id="insertRoleResourceBatch">
+        INSERT INTO role_resource (role_id,resource_id)
+        VALUES
+        <foreach collection="list" item="id" separator=",">
+            (#{roleId},#{id})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRoleResourceByRoleId">
+        DELETE FROM role_resource
+        WHERE rold_id = #{roleId}
+    </delete>
+
+    <update id="updateRoleResource">
+        UPDATE role_resource SET (role_id=#{roleId},resource_id=#{resourceId}) WHERE id = #{id}
+    </update>
+
+    <select id="findRoleResourceList" resultType="java.lang.String">
+        SELECT resource_id
+        FROM role_resource
+        WHERE role_id = #{roleId}
+    </select>
+
+    <select id="selectRoleResource" resultType="roleResource">
+        SELECT re.id as resourceId,re.name as resourceName,re.url as url,re.icon as icon,re.parentId as parentId,re.type as type,re.sort
+        FROM resources re
+        LEFT JOIN role_resource rr ON re.id = rr.resource_id
+        LEFT JOIN role r ON rr.role_id = r.id
+        LEFT JOIN role_users ru ON r.id = ru.role_id
+        LEFT JOIN users u ON rr.resource_id = re.id
+        <where>
+            r.status = 1
+            <if test="id != null">
+                AND u.id = #{id}
+            </if>
+            <if test="buttonFlag == 1">
+                AND re.type IN (1,2)
+            </if>
+        </where>
+        GROUP BY re.id
+        ORDER BY re.sort ASC
+    </select>
+
+    <select id="selectAllResource" resultType="roleResource">
+        SELECT re.id as resourceId,re.name as resourceName,re.url as url,re.icon as icon,re.parentId as parentId,re.type as type
+        FROM resources re
+        <where>
+            <if test="buttonFlag == 1">
+                re.type IN (1,2)
+            </if>
+
+        </where>
+        ORDER BY re.sort ASC
+    </select>
+
+    <delete id="deleteRoleResource">
+        DELETE FROM role_resource WHERE role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteRoleMul">
+        UPDATE role SET status = 0
+        WHERE
+        id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+
+</mapper>

@@ -2,10 +2,12 @@ package com.shouyou.ims.entity;
 
 import com.shouyou.ims.commons.BaseEntity;
 
+import java.io.Serializable;
+
 /**
  * Created by makun on 2016/5/24.
  */
-public class Game extends BaseEntity {
+public class Game extends BaseEntity implements Serializable {
 
     private String name;
     private int status;

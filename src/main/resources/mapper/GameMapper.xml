@@ -11,25 +11,58 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findById" resultType="Game">
+    <select id="findList" resultType="Game">
         SELECT tr.id,tr.name,tr.status,tr.remark,tr.update_date as updateDate,tr.insert_date as insertDate,
         u1.name as updateUser,u2.name as insertUser
         FROM game tr LEFT JOIN users u1 on tr.update_user = u1.id
         LEFT JOIN users u2 on tr.insert_user = u2.id
         <where>
-            1=1
-            <if test="status!=-1">
-                AND tr.status = #{status}
-            </if>
+                tr.status = 1
             <if test="name!=null">
                 AND tr.name LIKE CONCAT('%',#{name},'%')
             </if>
         </where>
     </select>
 
+    <select id="searchByLike" resultType="Game">
+        SELECT tr.id,tr.name,tr.status
+        FROM game tr
+        <where>
+            tr.status = 1
+            <if test="search!=null">
+                AND tr.name LIKE CONCAT(#{search},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findByName" resultType="Game">
+        SELECT tr.id,tr.name,tr.status
+        FROM game tr
+        <where>
+            tr.status = 1
+            <if test="search!=null">
+                AND tr.name = #{search}
+            </if>
+        </where>
+    </select>
+
+    <select id="searchByEn" resultType="Game">
+        SELECT tr.id,tr.name
+        FROM game tr,
+        <foreach collection="list" index="index" separator=",">
+                t_cosler c${index}
+        </foreach>
+        WHERE tr.status = 1 AND
+        <foreach collection="list" index="index" item="item" separator="AND">
+            CONV(HEX(substring(tr.name,${index+1},1)),16,10) between c${index}.cBegin and c${index}.cEnd AND
+            c${index}.f_PY = #{item}
+        </foreach>
+
+    </select>
+
     <insert id="insert">
-        INSERT INTO game (name,status,remark,update_date,insert_date,update_user,insert_user)
-        VALUES (#{name},#{status},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+        INSERT INTO game (name,update_date,insert_date,update_user,insert_user)
+        VALUES (#{name},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
     </insert>
 
     <update id="update">
@@ -43,7 +76,17 @@
 
     <update id="delete">
         UPDATE game SET
-        status = #{status}
+        status = 0
         WHERE id = #{id}
+    </update>
+
+    <update id="deleteMul">
+        UPDATE game SET
+        status = 0,update_user = #{userId}
+        WHERE
+        id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </update>
 </mapper>

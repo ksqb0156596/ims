@@ -10,8 +10,7 @@ import net.sf.ehcache.Element;
 public class CacheUtils {
 	
 	private final static CacheManager cacheManager = CacheManager.create("/ehcache.xml");
-
-	private static final String SYS_CACHE = "sysCache";
+	public static final String SYS_CACHE = "sysCache";
 	/**
 	 * 获取SYS_CACHE缓存
 	 * @param key

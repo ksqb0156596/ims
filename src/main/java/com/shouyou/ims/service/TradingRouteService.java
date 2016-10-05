@@ -2,11 +2,14 @@ package com.shouyou.ims.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.shouyou.ims.commons.UserUtils;
 import com.shouyou.ims.dao.TradingRouteDao;
 import com.shouyou.ims.entity.TradingRoute;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by makun on 2016/5/24.
@@ -35,7 +38,10 @@ public class TradingRouteService {
         return tradingRouteDao.update(tradingRoute);
     }
 
-    public int delete(TradingRoute tradingRoute){
-        return tradingRouteDao.delete(tradingRoute);
+    public int delete(String id){
+        return tradingRouteDao.delete(id);
+    }
+    public int delete(List<String> ids){
+        return tradingRouteDao.deleteMul(ids, UserUtils.getUser().getId());
     }
 }

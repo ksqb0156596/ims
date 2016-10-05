@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ehcache updateCheck="false" name="defaultCache">
-    <diskStore path="../temp/okr/ehcache" />
+    <diskStore path="../temp/ehcache" />
     <!-- 默认缓存配置. -->
     <defaultCache maxEntriesLocalHeap="200" eternal="false" overflowToDisk="true" timeToIdleSeconds="1800" />
 
     <cache name="userinfo" maxEntriesLocalHeap="200" eternal="false" overflowToDisk="true" timeToIdleSeconds="1800"/>
-    <cache name="sysCache" maxEntriesLocalHeap="200" eternal="false" overflowToDisk="true" timeToIdleSeconds="1800"/>
+    <cache name="sysCache" maxEntriesLocalHeap="200" eternal="false" overflowToDisk="true" timeToIdleSeconds="86400"/>
 
     <!-- 用户缓存 -->
     <cache name="user"  maxElementsInMemory="200" eternal="false" overflowToDisk="true" timeToIdleSeconds="1800"/>
 
-    <cache name="dept" maxElementsInMemory="200" eternal="false" overflowToDisk="true" timeToIdleSeconds="1800"/>
 
 
 

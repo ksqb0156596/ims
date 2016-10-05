@@ -11,16 +11,19 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findById" resultType="TradingRoute">
+    <select id="findByName" resultType="TradingRoute">
+        SELECT tr.id,tr.name,tr.status
+        FROM trading_route tr
+        WHERE tr.status = 1 AND tr.name = #{name}
+    </select>
+
+    <select id="findList" resultType="TradingRoute">
         SELECT tr.id,tr.name,tr.status,tr.remark,tr.update_date as updateDate,tr.insert_date as insertDate,
         u1.name as updateUser,u2.name as insertUser
         FROM trading_route tr LEFT JOIN users u1 on tr.update_user = u1.id
         LEFT JOIN users u2 on tr.insert_user = u2.id
         <where>
-            1=1
-            <if test="status!=-1">
-               AND tr.status = #{status}
-            </if>
+                tr.status = 1
             <if test="name!=null">
                 AND tr.name LIKE CONCAT('%',#{name},'%')
             </if>
@@ -28,8 +31,8 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO trading_route (name,status,remark,update_date,insert_date,update_user,insert_user)
-        VALUES (#{name},#{status},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+        INSERT INTO trading_route (name,remark,update_date,insert_date,update_user,insert_user)
+        VALUES (#{name},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
     </insert>
 
     <update id="update">
@@ -43,7 +46,17 @@
 
     <update id="delete">
         UPDATE trading_route SET
-          status = #{status}
+          status = 0
         WHERE id = #{id}
+    </update>
+
+    <update id="deleteMul">
+        UPDATE trading_route SET
+        status = 0,update_user = #{userId}
+        WHERE
+        id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </update>
 </mapper>

@@ -2,11 +2,14 @@ package com.shouyou.ims.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.shouyou.ims.commons.UserUtils;
 import com.shouyou.ims.dao.PayWayDao;
 import com.shouyou.ims.entity.PayWay;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by makun on 2016/5/24.
@@ -33,5 +36,12 @@ public class PayWayService {
         }
         payWay.preUpdate();
         return payWayDao.update(payWay);
+    }
+
+    public int delete(String id){
+        return payWayDao.delete(id);
+    }
+    public int deleteMul(List<String> ids){
+        return payWayDao.deleteMul(ids, UserUtils.getUser().getId());
     }
 }

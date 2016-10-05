@@ -11,7 +11,7 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findById" resultType="PayWay">
+    <select id="findList" resultType="PayWay">
         SELECT tr.id,tr.name,tr.status,tr.remark,tr.update_date as updateDate,tr.insert_date as insertDate,
         u1.name as updateUser,u2.name as insertUser
         FROM pay_way tr LEFT JOIN users u1 on tr.update_user = u1.id
@@ -45,5 +45,15 @@
         UPDATE pay_way SET
         status = #{status}
         WHERE id = #{id}
+    </update>
+
+
+    <update id="deleteMul">
+        UPDATE pay_way SET
+        status = #{status},update_user = #{userId}
+        WHERE id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </update>
 </mapper>

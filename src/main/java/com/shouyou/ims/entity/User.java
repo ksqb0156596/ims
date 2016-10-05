@@ -3,36 +3,79 @@ package com.shouyou.ims.entity;
 import com.shouyou.ims.commons.BaseEntity;
 
 import java.io.Serializable;
+import java.util.Date;
 
-/**
- * Created by Administrator on 2016/5/14.
- */
-public class User extends BaseEntity implements Serializable {
-    private String role;
+public class User extends BaseEntity implements Serializable{
+
     private String name;
-    private int status;
 
-    public String getRole() {
-        return role;
-    }
+    private String username;
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+    private String password;
+
+    private String wechat;
+
+    private String qq;
+
+    private String phone;
+
+    private Integer status;
+
 
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name == null ? null : name.trim();
     }
 
-    public int getStatus() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim();
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password == null ? null : password.trim();
+    }
+
+    public String getWechat() {
+        return wechat;
+    }
+
+    public void setWechat(String wechat) {
+        this.wechat = wechat == null ? null : wechat.trim();
+    }
+
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq == null ? null : qq.trim();
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone == null ? null : phone.trim();
+    }
+
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
+
 }

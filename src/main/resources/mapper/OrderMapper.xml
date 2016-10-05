@@ -3,63 +3,65 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shouyou.ims.dao.OrderDao">
-    <select id="findById" resultType="Order">
-        SELECT o.id,o.order_number,o.client_id,o.game_id,o.platform_id,o.account_id,o.pay_id,o.trading_id,o.status,
-            o.production_price,o.trading_price,o.recharge_type,o.remark,o.update_date,o.insert_date,
-            c.name as clientName,g.name as gameName,gp.name as platformName,a.name as accountName,
-            pw.name as payName,tr.name as tradingName,
-            u1.name as updateUser,u2.name as insertUser
+    <sql id="BaseSQL">
+        o.id,o.order_no,o.client_id,o.game_id,o.platform_id,o.account_id,
+--         o.pay_id,
+        o.trading_id,o.director_id,o.profit,
+        o.production_price,o.trading_price,o.recharge_type,o.denomination,
+        c.name as clientName,g.name as gameName,p.name as platformName,a.name as accountName,
+--         pw.name as payName,
+        tr.name as tradingName,db.name as directorName,d.name as clientBelong,dis.point,dis.real_point,l.name as levelName,
+        o.status,o.remark,o.update_date,o.insert_date,u1.name as updateUser,u2.name as insertUser
         FROM orders o
-        LEFT JOIN clients c ON c.id = o.clientId
+        LEFT JOIN clients c ON c.id = o.client_id
+        LEFT JOIN levels l ON l.id = c.level_id
+        LEFT JOIN users d ON d.id = c.user_id
+        LEFT JOIN users db ON db.id = o.director_id
         LEFT JOIN game g ON o.game_id = o.game_id
-        LEFT JOIN gaming_platform gp ON o.platform_id = gp.id
+        LEFT JOIN game_platform p ON o.platform_id = p.id
         LEFT JOIN accounts a ON o.account_id = a.id
-        LEFT JOIN pay_way pw ON o.pay_id = pw.id
+--         LEFT JOIN pay_way pw ON o.pay_id = pw.id
         LEFT JOIN trading_route tr ON o.trading_id = tr.id
+        LEFT JOIN discount dis ON dis.platform_id = o.platform_id AND dis.game_id = o.game_id
         LEFT JOIN users u1 on o.update_user = u1.id
         LEFT JOIN users u2 on o.insert_user = u2.id
-        WHERE o.id = #{id}
+
+    </sql>
+
+    <select id="findByOrderNo" resultType="Order">
+        SELECT  o.id,o.order_no,o.client_id,o.game_id,o.platform_id,o.account_id,
+        o.trading_id,o.director_id,o.profit,
+        o.production_price,o.trading_price,o.recharge_type,o.denomination,
+         o.status,o.remark,o.update_date,o.insert_date
+        FROM orders o
+        WHERE o.order_no = #{orderNo}
     </select>
-    <select id="findList" resultType="Order">
-        SELECT o.id,o.order_number,o.client_id,o.game_id,o.platform_id,o.account_id,o.pay_id,o.trading_id,o.status,o.denomination
-            o.production_price,o.trading_price,o.recharge_type,o.remark,o.update_date,o.insert_date,
-            c.name as clientName,g.name as gameName,gp.name as platformName,a.name as accountName,
-            pw.name as payName,tr.name as tradingName,
-            u1.name as updateUser,u2.name as insertUser
-        FROM orders o
-        LEFT JOIN clients c ON c.id = o.clientId
-        LEFT JOIN game g ON o.game_id = o.game_id
-        LEFT JOIN gaming_platform gp ON o.platform_id = gp.id
-        LEFT JOIN accounts a ON o.account_id = a.id
-        LEFT JOIN pay_way pw ON o.pay_id = pw.id
-        LEFT JOIN trading_route tr ON o.trading_id = tr.id
-        LEFT JOIN users u1 on o.update_user = u1.id
-        LEFT JOIN users u2 on o.insert_user = u2.id
+    <select id="findById" resultType="Order">
+        SELECT <include refid="BaseSQL" />
+        WHERE o.id = #{id}
+        GROUP BY id
+    </select>
+    <select id="findList" resultType="Order" parameterType="Order">
+        SELECT <include refid="BaseSQL" />
         <where>
             1=1
-            <if test="orderNumber!=null and orderNumber!=''">
-                AND o.order_number LIKE CONCAT('%',#{orderNumber},'%')
+            <if test="orderNo!=null and orderNo!=''">
+                AND o.order_no LIKE CONCAT('%',#{orderNo},'%')
             </if>
             <if test="clientName!=null and clientName!=''">
                 AND c.name LIKE CONCAT('%',#{clientName},'%')
             </if>
-            <if test="gameId!=null and gameId!=''">
-                AND o.game_id = #{gameId}
+            <if test="gameName!=null and gameName!=''">
+                AND g.name LIKE CONCAT('%',#{gameName},'%')
             </if>
-            <if test="platformId!=null and platformId!=''">
-                AND o.platform_id = #{platformId}
+            <if test="platformName!=null and platformName!=''">
+                AND p.name = LIKE CONCAT('%',#{platformName},'%')
             </if>
-            <if test="accountId!=null and accountId!=''">
-                AND o.account_id = #{accountId}
-            </if>
-            <if test="payId!=null and payId!=''">
-                AND o.pay_id = #{payId}
+            <if test="accountName!=null and accountName!=''">
+                AND a.name = #{accountName}
             </if>
             <if test="tradingId!=null and tradingId!=''">
                 AND o.trading_id = #{tradingId}
-            </if>
-            <if test="status!=-1">
-                AND o.status = #{status}
             </if>
             <if test="denomination!=null">
                 AND o.denomination = #{denomination}
@@ -70,8 +72,20 @@
             <if test="productionPrice!=null">
                 AND o.production_price = #{productionPrice}
             </if>
-            <if test="rechargeType!=-1">
+            <if test="rechargeType!=null">
                 AND o.recharge_type = #{rechargeType}
+            </if>
+            <if test="point!=null">
+                AND dis.point = #{point}
+            </if>
+            <if test="realPoint!=null">
+                AND dis.real_point = #{realPoint}
+            </if>
+            <if test="directorId!=null">
+                AND o.director_id = #{directorId}
+            </if>
+            <if test="clientBelongId!=null">
+                AND d.id = #{clientBelongId}
             </if>
             <if test="updateUser!=null and updateUser!=''">
                 AND o.update_user = #{updateUser}
@@ -79,16 +93,23 @@
             <if test="insertUser!=null and insertUser!=''">
                 AND o.insert_user = #{insertUser}
             </if>
+            <if test="status!=null">
+                AND o.status = #{status}
+            </if>
+            <if test="levelName!=null">
+                AND l.name = #{levelName}
+            </if>
         </where>
+        GROUP BY o.id
     </select>
     
     <insert id="insert">
         INSERT INTO orders 
-        (id,order_number,client_id,game_id,platform_id,account_id,pay_id,trading_id,status,denomination
-            production_price,trading_price,recharge_type,remark,update_date,insert_date,insert_user,update_user)
+        (id,order_no,client_id,game_id,platform_id,account_id,pay_id,trading_id,director_id,status,denomination,
+            production_price,trading_price,profit,recharge_type,remark,update_date,insert_date,insert_user,update_user)
             VALUES
-        (#{id},#{orderNumber},#{clientId},#{gameId},#{platformId},#{accountId},#{payId},#{tradingId},#{status},#{denomination}
-            #{productionPrice},#{tradingPrice},#{rechargeType},#{remark},#{updateDate},#{insertDate},#{insertUser},#{updateUser})
+        (#{id},#{orderNo},#{clientId},#{gameId},#{platformId},#{accountId},#{payId},#{tradingId},#{directorId},#{status},#{denomination},
+            #{productionPrice},#{tradingPrice},#{profit},#{rechargeType},#{remark},#{updateDate},#{insertDate},#{insertUser},#{updateUser})
     </insert>
 
     <update id="update">
@@ -100,10 +121,15 @@
           denomination = #{denomination},
           production_price = #{productionPrice},
           trading_price = #{tradingPrice},
+          profit = #{profit},
           recharge_type = #{rechargeType},
           update_date = #{updateDate},
           update_user = #{updateUser}
         WHERE
           id = #{id}
+    </update>
+
+    <update id="delete" parameterType="java.lang.String">
+        UPDATE orders SET status = 9999 WHERE id=#{id}
     </update>
 </mapper>

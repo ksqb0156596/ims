@@ -20,6 +20,10 @@ var APIUtils = {
     });
 
     request.fail(function(err) {
+      if(err.status == 9999){
+        window.location.href = '/login.html';
+        return false;
+      }
       swal({
         title: '系统错误，请求超时！',
         text: '',
@@ -29,7 +33,7 @@ var APIUtils = {
         confirmButtonText: '重新加载',
         closeOnConfirm: false
       },function(){
-        window.location.href = '/';
+        window.location.href = '/login.html';
       });
 
       deferred.reject();

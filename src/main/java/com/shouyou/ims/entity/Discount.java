@@ -2,16 +2,36 @@ package com.shouyou.ims.entity;
 
 import com.shouyou.ims.commons.BaseEntity;
 
+import java.io.Serializable;
+
 /**
  * Created by makun on 2016/5/24.
  */
-public class Discount extends BaseEntity {
+public class Discount extends BaseEntity implements Serializable {
     private String platformId;
     private String gameId;
     private double point;
+    private double realPoint;
     private int status;
     private String platformName;
     private String gameName;
+    private Integer rechargeType;
+
+    public Integer getRechargeType() {
+        return rechargeType;
+    }
+
+    public void setRechargeType(Integer rechargeType) {
+        this.rechargeType = rechargeType;
+    }
+
+    public double getRealPoint() {
+        return realPoint;
+    }
+
+    public void setRealPoint(double realPoint) {
+        this.realPoint = realPoint;
+    }
 
     public String getPlatformId() {
         return platformId;
