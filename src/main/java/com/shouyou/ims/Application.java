@@ -11,6 +11,7 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 import javax.servlet.MultipartConfigElement;
@@ -20,6 +21,7 @@ import javax.servlet.MultipartConfigElement;
  */
 @SpringBootApplication
 @EnableCaching
+@EnableTransactionManagement
 public class Application extends SpringBootServletInitializer{
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {

@@ -7,6 +7,7 @@ import { Button } from 'antd';
 import { Modal } from 'antd';
 import { Select } from 'antd';
 import { Form, Row, Col } from 'antd';
+import { message } from 'antd';
 const Option = Select.Option;
 const FormItem = Form.Item;
 var Api = require("../../utils/api-utils");
@@ -139,14 +140,6 @@ var SearchClient = React.createClass({
                     {flag?<Input id="client-phone"   value={client.phone}onChange={this.handleChange} />
                         :<Input id="client-phone"   value={client.phone}onChange={this.handleChange} readOnly={true}/>}
                 </FormItem>
-                <FormItem
-                    label="归属员工"
-                    labelCol={{ span: 6 }}
-                    wrapperCol={{ span: 14 }}
-                >
-                    {_user}
-                </FormItem>
-
 
             </Form>
         }
@@ -167,6 +160,10 @@ var SearchClient = React.createClass({
         this.setState({condition:e.target.value});
     },
     search : function () {
+        if(this.state.condition.length == 0){
+            message.warning("请输入客户名称",5);
+            return;
+        }
         Api.request({
             method : "GET",
             url : Url.FIND_CLIENT_BY_CON,

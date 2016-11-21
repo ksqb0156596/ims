@@ -69,6 +69,7 @@ var Menus = React.createClass({
             platformList:[],
             accountList : [],
             tradingList : [],
+            total:0,
             uploadVisible : false,
             validate :{
                 clientName : "",
@@ -93,7 +94,7 @@ var Menus = React.createClass({
             url : Url.FIND_ORDERS,
             data : _.extend({pageNum:current,pageSize:pageSize},record)
         }).then(function (data) {
-            this.setState({pageNum: current, pageSize: pageSize, menus: data.result.list,searchModel:record,uploadVisible:false});
+            this.setState({pageNum: current, pageSize: pageSize, menus: data.result.list,searchModel:record,uploadVisible:false,total:data.result.total});
             message.destroy();
         }.bind(this))
     },
@@ -107,6 +108,12 @@ var Menus = React.createClass({
                     return <a href="javascript:void(0)" onClick={$this._edit.bind(null,text)}>{text.orderNo}</a>
                 },
                 width:'250px'
+            },
+            {
+                title : "订单日期",
+                dataIndex : "orderDate",
+                key : "orderDate",
+                width:'120px'
             },
             {
                 title : "客户名",
@@ -245,29 +252,30 @@ var Menus = React.createClass({
 
         ];
         var pagination = {
-            total: this.state.menus.length,
+            total: this.state.total,
+            current : this.state.pageNum,
             showSizeChanger: true,
             pageSize : this.state.pageSize,
             onShowSizeChange : function(current, pageSize) {
                 this.findList(current,pageSize);
-
             }.bind(this),
             onChange : function(current) {
                 this.findList(current,this.state.pageSize);
             }.bind(this),
         };
         var rowSelection = {
+            type : 'radio',
             onChange : function(selectedRowKeys, selectedRows) {
                 this.setState({selectedRows : selectedRows});
             }.bind(this),
         }
         var _Modal = '';
         if(this.state.visible){
-            _Modal = <Forms visible={this.state.visible} loading={this.state.loading} record={this.state.record} validate={this.state.validate} accountList={this.state.accountList}
+            _Modal = <Forms visible={this.state.visible} loading={this.state.loading} record={this.state.record} validate={this.state.validate}
                             gameList={this.state.gameList} platformList={this.state.platformList} tradingList={this.state.tradingList} statusOptions={this.state.statusOptions} users={this.state.users}
                             handleCancel = {this.handleCancel} handleOk={this.handleOk} handleChange={this._handleChange} findClients={this.findClients}
                             handleGameChange = {this.handleGameChange} handleGameSelectChange={this.handleGameSelectChange} handleSelectChange={this._handleSelectChange}
-                            clientHandleOk = {this.clientHandleOk}
+                            clientHandleOk = {this.clientHandleOk} handleBlur={this.handleBlur}
             />
         }
         var _upload = '';
@@ -306,7 +314,7 @@ var Menus = React.createClass({
                         statusOptions={this.statusOptions} users={this.state.users}/>
             {_Modal}
             {_upload}
-            <ButtonList add={this._add} delete={this._delete} showUpload={this.showUpload}/>
+            <ButtonList add={this._add} delete={this._delete} showUpload={this.showUpload} download={this.download}/>
             <Table useFixedHeader={true} rowSelection={rowSelection} dataSource={this.state.menus} pagination={pagination} columns={columns} scroll={{ x:3000 }}/>
         </div>
     },
@@ -317,6 +325,11 @@ var Menus = React.createClass({
     onUploadCancel : function () {
         this.setState({uploadVisible:false});
     },
+
+    download : function () {
+        Api.download(this.state.searchModel,Url.EXPORT_ORDER);
+    },
+   
     _edit : function (record) {
         this.setState({
             record : record,
@@ -348,14 +361,85 @@ var Menus = React.createClass({
             cancelButtonText: '取消',
         },function() {
             message.loading("加载中，请稍后。。。", 0);
+            var order = selectedRows[0];
             Api.request({
                 method: 'POST',
                 url: Url.DEL_ORDER,
-                data: selectedRows[0]
+                data: {id:order.id}
             }).then(function (result) {
                 this.findList(this.state.pageNum, this.state.pageSize);
+                this.setState({selectedRows : []});
             }.bind(this))
         }.bind(this))
+    },
+    handleBlur : function () {
+        var record = this.state.record;
+        var validate = this.state.validate;
+        if(record.rechargeType == 1 && record.accountName){
+            Api.request({
+                url : Url.FIND_ACCOUNT_BY_NAME,
+                data : {name:record.accountName}
+            }).then(function (data1) {
+                var _list = data1.result;
+                if(_list.length == 0){
+                    Modal.error({
+                        title : "账号不存在"
+                    })
+                    return false;
+                }
+                else if(_list.length == 1){
+                    var account = _list[0];
+                    record.accountId = account.id;
+                    record.accountName = account.name;
+                    record.gameId = account.gameId;
+                    record.gameId = account.gameId;
+                    record.gameName = account.gameName;
+                    record.platformId = account.platformId;
+                    record.platformName = account.platformName;
+                    record.clientBelong = account.userName;
+                    record.clientBelongId = account.userId;
+                    if(account.clientName == undefined || account.clientName.length == 0){
+                        message.warning("账户尚未绑定客户，请手动添加",5);
+                    }else{
+                        record.clientName = account.clientName;
+                        record.clientId = account.clientId;
+                    }
+                    Api.request({
+                        method : "GET",
+                        data : {gameId:record.gameId,platformId:record.platformId,rechargeType:record.rechargeType},
+                        url : Url.QUERY_DISCOUNT,
+
+                    }).then(function (data) {
+                        if(data.status == 1){
+                            validate.gameId = "";
+                            validate.gameMsg = "";
+                            validate.platformId = "";
+                            validate.platformMsg = "";
+                            var result = data.result;
+                            record.point = result.point;
+                            record.realPoint = result.realPoint;
+                            this.setState({record:record,validate:validate});
+                        }else{
+                            swal({
+                                title : "游戏折扣不存在",
+                                text : "请检查游戏信息是否正确或添加新的折扣信息",
+                                type : "error"
+                            });
+                            validate.gameId = "error";
+                            validate.gameMsg = "折扣不存在";
+                            validate.platformId = "error";
+                            validate.platformMsg = "折扣不存在";
+                            this.setState({
+                                validate:validate,record:record
+                            });
+                            return false;
+                        }
+
+
+                    }.bind(this))
+                }
+            }.bind(this))
+        }
     },
     _handleChange : function(e,name){
         var record = this.state.record;
@@ -369,14 +453,14 @@ var Menus = React.createClass({
             key = e.target.name;
             record[e.target.name] = e.target.value;
         }
-        if(record.denomination && record.denomination.length > 0){
-            if(record.point && record.point >= 0 && record.realPoint && record.realPoint >= 0){
+        if(!isNaN(record.denomination)){
+            if(!isNaN(record.point) && record.point >= 0 && !isNaN(record.realPoint) && record.realPoint >= 0){
                 if(key != 'tradingPrice'){
                     record.tradingPrice = Math.round(record.denomination * record.point / 10);
                 }
                 record.productionPrice = Math.round(record.denomination * record.realPoint / 10);
                 record.profit = record.tradingPrice - record.productionPrice;
-                if(record.profit > 0){
+                if(record.profit >= 0){
                     validate.profit = ""
                 }else{
                     validate.profit = "warning"
@@ -503,38 +587,31 @@ var Menus = React.createClass({
                 if(record.rechargeType == 1){
                     _obj.clientId = record.clientId;
                 }
-                Api.request({
-                    method : "GET",
-                    url : Url.FIND_ACCOUNT_BY_INFO,
-                    data :_obj
-                }).then(function (data1) {
-                    var _accounts = data1.result;
+                if(data.status == 1){
+                    validate.gameId = "";
+                    validate.gameMsg = "";
+                    validate.platformId = "";
+                    validate.platformMsg = "";
+                    var result = data.result;
+                    record.point = result.point;
+                    record.realPoint = result.realPoint;
+                    this.setState({record:record,validate:validate});
+                }else{
+                    swal({
+                        title : "游戏折扣不存在",
+                        text : "请检查游戏信息是否正确或添加新的折扣信息",
+                        type : "error"
+                    });
+                    validate.gameId = "error";
+                    validate.gameMsg = "折扣不存在";
+                    validate.platformId = "error";
+                    validate.platformMsg = "折扣不存在";
+                    this.setState({
+                        validate:validate,record:record
+                    });
+                    return false;
+                }
 
-                    if(data.status == 1){
-                        validate.gameId = "";
-                        validate.gameMsg = "";
-                        validate.platformId = "";
-                        validate.platformMsg = "";
-                        var result = data.result;
-                        record.point = result.point;
-                        record.realPoint = result.realPoint;
-                        this.setState({record:record,validate:validate,accountList:_accounts});
-                    }else{
-                        swal({
-                            title : "游戏折扣不存在",
-                            text : "请检查游戏信息是否正确或添加新的折扣信息",
-                            type : "error"
-                        });
-                        validate.gameId = "error";
-                        validate.gameMsg = "折扣不存在";
-                        validate.platformId = "error";
-                        validate.platformMsg = "折扣不存在";
-                        this.setState({
-                            validate:validate,record:record
-                        });
-                        return false;
-                    }
-                }.bind(this))
                 
             }.bind(this))
         }else{
@@ -552,7 +629,6 @@ var Menus = React.createClass({
             if(client.id){
                 record.clientId = client.id;
                 record.clientName = client.name;
-                record.clientBelong = client.userName;
                 this.setState({record:record});
             }else{
                 message.warning("用户不存在将自动添加");
@@ -562,9 +638,14 @@ var Menus = React.createClass({
                     data:client
                 }).then(function(data){
                     client = data.result;
+                    if(data.status == 2){
+                        Modal.warning({
+                            title : "客户已存在",
+                            content : "用户重复，请继续完善信息"
+                        })
+                    }
                     record.clientId = client.id;
                     record.clientName = client.name;
-                    record.clientBelong = client.userName;
                     if(data.status == 0){
                         Modal.warning({
                             title : "客户已存在",
@@ -585,6 +666,7 @@ var ButtonList = React.createClass({
     render : function(){
         return     <Row type="flex" justify="end" className="ant-btn-list">
             <Col sm={4}><Button key="showUpload" type="primary" onClick={this.props.showUpload}>上传Excel</Button></Col>
+            <Col sm={4}><Button key="download" type="primary" onClick={this.props.download}>导出当前结果</Button></Col>
             <Col sm={4}><Button key="add" type="primary" onClick={this.props.add}>新增</Button></Col>
             <Col sm={4}><Button key="delete" onClick={this.props.delete}>删除</Button></Col>
         </Row>

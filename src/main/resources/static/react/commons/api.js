@@ -9,6 +9,7 @@ module.exports = {
     FIND_ORDERS : baseUrl + '/orders/findList',
     SAVE_ORDER : baseUrl + '/orders/save',
     DEL_ORDER : baseUrl + '/orders/delete',
+    EXPORT_ORDER : baseUrl + '/orders/export',
 
 
     /**
@@ -52,7 +53,7 @@ module.exports = {
     FIND_CLIENT_BY_CON : baseUrl + "/client/findClientCon",
     SAVE_CLIENT : baseUrl + "/client/save",
     DEL_CLIENT : baseUrl + "/client/deleteMul",
-    CHECK_CLIENT_REPEAT : baseUrl + "/client/checkRepeat",
+    // CHECK_CLIENT_REPEAT : baseUrl + "/client/checkRepeat",
 
     /**
      * level
@@ -101,7 +102,13 @@ module.exports = {
      */
     FIND_ACCOUNT_LIST : baseUrl + "/account/findList",
     FIND_ACCOUNT_BY_ID : baseUrl + "/account/findById",
-    FIND_ACCOUNT_BY_INFO : baseUrl + "/account/findListByInfo",
+    FIND_ACCOUNT_BY_NAME : baseUrl + "/account/findListByName",
     SAVE_ACCOUNT : baseUrl + "/account/save",
     DEL_ACCOUNT : baseUrl + "/account/deleteMul",
+
+    /**
+     * statistics
+     */
+    STATISTICS : baseUrl + "/statistics/statistics",
+    STATISTICS_ALL : baseUrl + "/statistics/statisticsAll"
 }

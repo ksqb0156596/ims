@@ -40,6 +40,18 @@ var APIUtils = {
     });
 
     return deferred.promise();
+  },
+  download : function(obj,url){
+    var form = '<form id="download" action="' + url + '">';
+    var keys = _.keys(obj);
+    for(var i in keys){
+      var key = keys[i];
+      form += "<input type='hidden' name='" + key + "' value='" + obj[key] + "' />"
+    }
+    form += "</form>";
+    $("body").append(form);
+    $("#download").submit();
+    $("#download").remove();
   }
 };
 

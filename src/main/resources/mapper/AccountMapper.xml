@@ -4,24 +4,26 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shouyou.ims.dao.AccountDao">
     <select id="findById" resultType="Account">
-        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,a.user_id,u.name as userName,
         c.name as clientName,g.name as platformName,gm.name as gameName,u1.name as updateUser,u2.name as insertUser
         FROM accounts a
         LEFT JOIN clients c ON a.client_id = c.id
         LEFT JOIN game gm ON gm.id = a.game_id
         LEFT JOIN game_platform g ON g.id = a.platform_id
+        LEFT JOIN users u ON u.id = a.user_id
         LEFT JOIN users u1 on a.update_user = u1.id
         LEFT JOIN users u2 on a.insert_user = u2.id
         WHERE a.id = #{id}
     </select>
 
     <select id="findList" resultType="Account">
-        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,a.update_date,a.insert_date,
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,a.user_id,u.name as userName,a.update_date,a.insert_date,
         c.name as clientName,g.name as platformName,gm.name as gameName,u1.name as updateUser,u2.name as insertUser
         FROM accounts a
         LEFT JOIN clients c ON a.client_id = c.id
         LEFT JOIN game gm ON gm.id = a.game_id
         LEFT JOIN game_platform g ON g.id = a.platform_id
+        LEFT JOIN users u ON u.id = a.user_id
         LEFT JOIN users u1 on a.update_user = u1.id
         LEFT JOIN users u2 on a.insert_user = u2.id
         <where>
@@ -38,11 +40,14 @@
             <if test="platformName!=null">
                 AND g.name = #{platformName}
             </if>
+            <if test="userId!=null">
+                AND a.user_id = #{userId}
+            </if>
         </where>
     </select>
 
     <select id="findListByInfo" resultType="Account">
-        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,a.user_id
         c.name as clientName,g.name as platformName,gm.name as gameName
         FROM accounts a
         LEFT JOIN clients c ON a.client_id = c.id
@@ -64,7 +69,7 @@
     </select>
 
     <select id="findAccount" resultType="Account">
-        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,a.user_id
         FROM accounts a
         <where>
             a.status = 1
@@ -74,11 +79,24 @@
         </where>
     </select>
 
+    <select id="findListByName" resultType="Account">
+        SELECT a.id,a.name,a.password,a.client_id,a.platform_id,a.game_id,a.status,a.remark,a.user_id,u.name as userName,
+        c.name as clientName,g.name as platformName,gm.name as gameName
+        FROM accounts a
+        LEFT JOIN clients c ON a.client_id = c.id
+        LEFT JOIN game gm ON gm.id = a.game_id
+        LEFT JOIN game_platform g ON g.id = a.platform_id
+        LEFT JOIN users u ON u.id = a.user_id
+        WHERE
+            a.status = 1
+            AND a.name = #{name}
+    </select>
+
     <insert id="insert">
         INSERT INTO accounts
-        (id,name,password,client_id,game_id,platform_id,remark,update_date,insert_date,update_user,insert_user)
+        (id,name,password,client_id,game_id,platform_id,user_id,remark,update_date,insert_date,update_user,insert_user)
         VALUES
-        (#{id},#{name},#{password},#{clientId},#{gameId},#{platformId},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
+        (#{id},#{name},#{password},#{clientId},#{gameId},#{platformId},#{userId},#{remark},#{updateDate},#{insertDate},#{updateUser},#{insertUser})
     </insert>
 
     <update id="update">
@@ -88,6 +106,7 @@
             client_id = #{clientId},
             platform_id = #{platformId},
             game_id = #{gameId},
+            user_id = #{userId},
             update_date = #{updateDate},
             update_user = #{updateUser}
         WHERE id = #{id}

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shouyou.ims.dao.StatisticsDao">
+    <select id="queryStatistics" resultType="statisticsResult">
+        SELECT
+        <if test="tableName!=null">
+             a.id,
+        </if>
+        SUM(o.trading_price) as trading,SUM(o.production_price) as cost,COUNT(o.id) as num,
+        SUM(o.profit) as profit,SUM(denomination) as denomination
+        <if test="tableName!=null">
+            , a.name
+        </if>
+
+        FROM orders o
+        <if test="tableName!=null">
+            LEFT JOIN ${tableName} a ON a.id = o.${tableId}
+        </if>
+        <where>
+            o.status IN (1,2,3,4,5)
+            <if test="name!=null and name!=''">
+                AND a.name LIKE CONCAT('%', #{name},'%')
+            </if>
+            <if test="startDate!=null and endDate!=null and startDate!='' and endDate!=''">
+                AND TO_DAYS(o.order_date) &gt;= TO_DAYS(#{startDate})
+                AND TO_DAYS(o.order_date) &lt;= TO_DAYS(#{endDate})
+            </if>
+        </where>
+        <if test="tableName!=null">
+            GROUP BY a.id
+        </if>
+    </select>
+
+    <select id="queryBelongStatistics" resultType="statisticsResult">
+        SELECT
+            u.id,
+        SUM(o.trading_price) as trading,SUM(o.production_price) as cost,COUNT(o.id) as num,
+        SUM(o.profit) as profit,SUM(denomination) as denomination,u.name
+
+        FROM orders o
+            LEFT JOIN accounts a ON o.account_id = a.id
+            LEFT JOIN users u ON u.id = a.user_id
+        <where>
+            o.status IN (1,2,3,4,5)
+            <if test="name!=null and name!=''">
+                AND a.name = #{name}
+            </if>
+            <if test="startDate!=null and endDate!=null and startDate!='' and endDate!=''">
+                AND TO_DAYS(o.order_date) &gt;= TO_DAYS(#{startDate})
+                AND TO_DAYS(o.order_date) &lt;= TO_DAYS(#{endDate})
+            </if>
+        </where>
+            GROUP BY u.id
+    </select>
+
+
+    <select id="getCountWithClient" resultType="java.lang.Integer">
+        SELECT count(0)
+        FROM (
+            SELECT COUNT(o.client_id)
+            FROM orders o
+            <where>
+                o.status IN (1,2,3,4,5)
+                <if test="startDate!=null and endDate!=null and startDate!='' and endDate!=''">
+                    AND TO_DAYS(o.order_date) &gt;= TO_DAYS(#{startDate})
+                    AND TO_DAYS(o.order_date) &lt;= TO_DAYS(#{endDate})
+                </if>
+            </where>
+            GROUP BY o.client_id
+        ) a
+    </select>
+
+    <select id="getCountWithAccount" resultType="java.lang.Integer">
+        SELECT count(0) FROM
+        (SELECT COUNT(o.account_id)
+        FROM orders o
+        <where>
+            o.status IN (1,2,3,4,5)
+            <if test="startDate!=null and endDate!=null and startDate!='' and endDate!=''">
+                AND TO_DAYS(o.order_date) &gt;= TO_DAYS(#{startDate})
+                AND TO_DAYS(o.order_date) &lt;= TO_DAYS(#{endDate})
+            </if>
+        </where>
+        GROUP BY o.account_id) a
+    </select>
+</mapper>

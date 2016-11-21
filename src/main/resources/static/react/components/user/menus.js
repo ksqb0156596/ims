@@ -29,6 +29,7 @@ var Menus = React.createClass({
             record : {},
             pageNum:1,
             pageSize:20,
+            total:0,
             searchModal : {},
             selectedRows : []
         }
@@ -39,7 +40,7 @@ var Menus = React.createClass({
             url : Url.FIND_RESOURCE_LIST,
             data : _.extend({pageNum:current,pageSize:pageSize},this.state.searchModal)
         }).then(function (data) {
-            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list});
+            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list,total:data.result.total});
             message.destroy();
         }.bind(this))
     },
@@ -101,8 +102,10 @@ var Menus = React.createClass({
             }
         ];
         var pagination = {
-            total: this.state.menus.length,
-            showSizeChanger: true,pageSize : this.state.pageSize,
+            total: this.state.total,
+            pageSize : this.state.pageSize,
+            current : this.state.pageNum,
+            showSizeChanger: true,
             onShowSizeChange : function(current, pageSize) {
                 this.findList(current,pageSize);
 
@@ -265,10 +268,13 @@ var Menus = React.createClass({
     },
     handleOk : function () {
         this.setState({loading:true});
+        var record = this.state.record;
+        record.updateDate = undefined;
+        record.insertDate = undefined;
         Api.request({
             method : "POST",
             url : Url.SAVE_RESOURCES,
-            data : this.state.record
+            data : record
         }).then(function(data){
             this.setState({visible:false,loading:false});
             this.findList(this.state.pageNum,this.state.pageSize);

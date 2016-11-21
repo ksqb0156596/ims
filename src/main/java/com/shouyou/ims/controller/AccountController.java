@@ -51,6 +51,11 @@ public class AccountController {
         return new ResultBo<>(1,accountService.deleteMul(ids)).toString();
     }
 
+    @RequestMapping(value = "/findListByName",method = RequestMethod.GET)
+    public String findListByName(@RequestParam("name")String name){
+        return new ResultBo<>(1,accountService.findListByName(name)).toString();
+    }
+
 
 
 

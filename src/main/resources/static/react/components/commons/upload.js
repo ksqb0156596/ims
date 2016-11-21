@@ -22,7 +22,7 @@ var _Upload = React.createClass({
                 <p className="ant-upload-text">点击或拖拽文件到此进行上传</p>
                 <p className="ant-upload-hint">请使用指定模板进行订单上传</p>
             </Dragger>
-            <a href="../../../files/订单导入.xls">点击此处下载Excel模板</a>
+            <a href="../../../files/importExcel.xls">点击此处下载Excel模板</a>
         </Modal>
     },
 

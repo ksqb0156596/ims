@@ -35,6 +35,7 @@ var Menus = React.createClass({
             levels : [],
             pageNum:1,
             pageSize:20,
+            total:0,
             searchModal : {},
             selectedRows : [],
             gameList : [],
@@ -47,7 +48,7 @@ var Menus = React.createClass({
             url : Url.FIND_DISCOUNT_LIST,
             data : _.extend({pageNum:current,pageSize:pageSize},this.state.searchModal)
         }).then(function (data) {
-            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list});
+            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list,total:data.result.total});
             message.destroy();
         }.bind(this))
     },
@@ -125,8 +126,10 @@ var Menus = React.createClass({
 
         ];
         var pagination = {
-            total: this.state.menus.length,
-            showSizeChanger: true,pageSize : this.state.pageSize,
+            total: this.state.total,
+            pageSize : this.state.pageSize,
+            current : this.state.pageNum,
+            showSizeChanger: true,
             onShowSizeChange : function(current, pageSize) {
                 this.findList(current,pageSize);
 

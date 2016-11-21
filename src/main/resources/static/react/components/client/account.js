@@ -24,6 +24,13 @@ var Client = require('./search-client');
 var Menus = React.createClass({
     componentWillMount : function () {
         this.findList(1,20);
+        Api.request({
+            url : Url.FIND_USER_LIST,
+            method : "GET",
+            data : {pageNum:1,pageSize:0}
+        }).then(function (data1) {
+            this.setState({users:data1.result.list})
+        }.bind(this))
     },
     getInitialState : function(){
         return {menus : [],
@@ -33,12 +40,14 @@ var Menus = React.createClass({
             levels : [],
             pageNum:1,
             pageSize:20,
+            total:0,
             searchModal : {},
             selectedRows : [],
             clientVisible : false,
             clientLoading : false,
             platformList : [],
-            gameList : []
+            gameList : [],
+            users : []
 
         }
     },
@@ -48,7 +57,7 @@ var Menus = React.createClass({
             url : Url.FIND_ACCOUNT_LIST,
             data : _.extend({pageNum:current,pageSize:pageSize},this.state.searchModal)
         }).then(function (data) {
-            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list});
+            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list,total:data.result.total});
             message.destroy();
         }.bind(this))
     },
@@ -88,6 +97,12 @@ var Menus = React.createClass({
                 width:'120px'
             },
             {
+                title : "账号归属人",
+                dataIndex : "userName",
+                key : "userName",
+                width:'120px'
+            },
+            {
                 title : "更新人",
                 dataIndex : "updateUser",
                 key : "updateUser",
@@ -118,8 +133,10 @@ var Menus = React.createClass({
 
         ];
         var pagination = {
-            total: this.state.menus.length,
-            showSizeChanger: true,pageSize : this.state.pageSize,
+            total: this.state.total,
+            pageSize : this.state.pageSize,
+            current : this.state.pageNum,
+            showSizeChanger: true,
             onShowSizeChange : function(current, pageSize) {
                 this.findList(current,pageSize);
 
@@ -146,6 +163,11 @@ var Menus = React.createClass({
             var gameList = this.state.gameList;
             for(var i in gameList){
                 gameOptions.push(<Option key={"g" + gameList[i].id} name={gameList[i].id} value={gameList[i].name}>{gameList[i].name}</Option>);
+            }
+            var userOptions = [];
+            var userList = this.state.users;
+            for(var i in userList){
+                userOptions.push(<Option key={"u" + userList[i].id} name={userList[i].id} value={userList[i].id}>{userList[i].name}</Option>);
             }
             _Modal = <Modal ref="modal"
                             visible={this.state.visible}
@@ -226,12 +248,22 @@ var Menus = React.createClass({
                         <Input value={record.clientName} id="clientName" readOnly={true} onClick={this.findClients}/>
 
                     </FormItem>
+                    <FormItem
+                        id="userName"
+                        label="归属员工"
+                        labelCol={{ span: 6 }}
+                        wrapperCol={{ span: 14 }}
+                    >
+                        <Select style={{width:'100%'}} value={record.userId} onChange={this._handleSelectChange}>
+                            {userOptions}
+                        </Select>
+                    </FormItem>
 
                 </Form>
             </Modal>
         }
         return <div>
-            <SearchForm search={this._search} clear={this._clear}
+            <SearchForm search={this._search} clear={this._clear} users={this.state.users} handleSelectChange={this._handleSearchSelectChange}
                         handleChange={this.searchHandleChange} searchModal={this.state.searchModal}/>
             {_Modal}
             {this.state.clientVisible ? <Client visible={this.state.clientVisible} loading={this.state.clientLoading} clientId={record.clientId}
@@ -282,8 +314,13 @@ var Menus = React.createClass({
     },
     _handleSelectChange : function (value) {
         var record = this.state.record;
-        record.type = value;
+        record.userId = value;
         this.setState({record:record});
+    },
+    _handleSearchSelectChange : function (value) {
+        var searchModal = this.state.searchModal;
+        searchModal.userId = value;
+        this.setState({searchModal:searchModal});
     },
     _search : function(){
         this.findList(this.state.pageNum,this.state.pageSize)
@@ -300,6 +337,9 @@ var Menus = React.createClass({
     },
     handleOk : function () {
         this.setState({loading:true});
+        var record = this.state.record;
+        record.updateDate = undefined;
+        record.insertDate = undefined;
         Api.request({
             method : "POST",
             url : Url.SAVE_ACCOUNT,
@@ -327,6 +367,8 @@ var Menus = React.createClass({
             record.clientId = client.id;
             this.setState({record:record,clientLoading:false,clientVisible:false});
         }else{
+            client.updateDate = undefined;
+            client.insertDate = undefined;
             Api.request({
                 method : "POST",
                 url : Url.SAVE_CLIENT,
@@ -395,8 +437,12 @@ var SearchForm = React.createClass({
             var obj = levels[i];
             options.push(<Option key={obj.id} value={obj.id}>{obj.name+":"+obj.minAmount+"~"+obj.maxAmount}</Option>)
         }
+        var userOptions = [];
+        var userList = this.props.users;
+        for(var i in userList){
+            userOptions.push(<Option key={"u" + userList[i].id} name={userList[i].id} value={userList[i].id}>{userList[i].name}</Option>);
+        }
         var searchModal = this.props.searchModal;
-        var levelId = (searchModal.levelId ? searchModal.levelId:-1);
         return  <Form horizontal  className="ant-advanced-search-form">
             <Row type="flex">
                 <Col sm={8}>
@@ -405,7 +451,7 @@ var SearchForm = React.createClass({
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 14 }}
                     >
-                        <Input placeholder="请输入客户名" size="default" id="search_name" value={searchModal.name} onChange={this.props.handleChange}/>
+                        <Input placeholder="请输入账号" size="default" id="search_name" value={searchModal.name} onChange={this.props.handleChange}/>
                     </FormItem>
                 </Col>
                 <Col sm={8}>
@@ -432,9 +478,21 @@ var SearchForm = React.createClass({
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 14 }}
                     >
-                        <Input placeholder="请输入电话" size="default" id="search_gameName" value={searchModal.gameName} onChange={this.props.handleChange}/>
+                        <Input placeholder="请输入游戏名" size="default" id="search_gameName" value={searchModal.gameName} onChange={this.props.handleChange}/>
                     </FormItem>
                 </Col>
+                <Col sm={8}>
+                    <FormItem
+                        label="归属员工"
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 14 }}
+                    >
+                        <Select allowClear={true} style={{width:'100%'}} value={searchModal.userId} onChange={this.props.handleSelectChange}>
+                            {userOptions}
+                        </Select>
+                    </FormItem>
+                </Col>
+
             </Row>
             <Row>
                 <Col span={12} offset={12} style={{ textAlign: 'right' }}>

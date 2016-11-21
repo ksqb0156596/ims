@@ -13,10 +13,29 @@ public class Account extends BaseEntity implements Serializable {
     private String clientId;
     private String platformId;
     private String gameId;
+    private String userId;
     private int status;
+    private String userName;
     private String gameName;
     private String clientName;
     private String platformName;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserId() {
+
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getName() {
         return name;

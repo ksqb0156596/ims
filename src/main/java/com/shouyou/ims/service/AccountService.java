@@ -42,6 +42,9 @@ public class AccountService {
         return accountDao.update(account);
     }
 
+    public List<Account> findListByName(String name){
+        return accountDao.findListByName(name);
+    }
     public int delete(String id){
         return accountDao.delete(id);
     }

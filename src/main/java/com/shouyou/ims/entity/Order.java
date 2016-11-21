@@ -35,11 +35,28 @@ public class Order extends BaseEntity implements Serializable {
     private String accountName;
     private String directorName;
     private String payName;
-
+    private String statusName;
     private String tradingName;
     private String denomination;
     private String levelName;
     private String accountPwd;
+    private String orderDate;
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
+    }
 
     public String getAccountPwd() {
         return accountPwd;

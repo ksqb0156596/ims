@@ -26,15 +26,15 @@ public class ClientController {
         return new ResultBo<>(1,clientService.findList(client)).toString();
     }
 
-    @RequestMapping(value = "/checkRepeat")
-    public String checkRepeat(Client client){
-        client = clientService.checkRepeat(client);
-        if(client == null){
-            return new ResultBo<>(0).toString();
-        }else {
-            return new ResultBo<>(1, client).toString();
-        }
-    }
+//    @RequestMapping(value = "/checkRepeat")
+//    public String checkRepeat(Client client){
+//        client = clientService.checkRepeat(client);
+//        if(client == null){
+//            return new ResultBo<>(0).toString();
+//        }else {
+//            return new ResultBo<>(1, client).toString();
+//        }
+//    }
 
     @RequestMapping(value = "/findClientCon")
     public Object findClientCon(@RequestParam("condition") String condition){

@@ -2,6 +2,7 @@
  * Created by Administrator on 2016/9/25.
  */
 import { Input } from 'antd';
+import { DatePicker  } from 'antd';
 import { Button } from 'antd';
 import { Modal } from 'antd';
 import { Select } from 'antd';
@@ -62,11 +63,6 @@ var Forms = React.createClass({
         for(var i in gameList){
             gameOptions.push(<Option key={"g" + gameList[i].id} name={gameList[i].id} value={gameList[i].name}>{gameList[i].name}</Option>);
         }
-        var accountOptions = [];
-        var accountList = this.props.accountList;
-        for(var i in accountList){
-            accountOptions.push(<Option key={"a" + accountList[i].id} value={accountList[i].id}>{accountList[i].name}</Option>);
-        }
 
         var record = this.props.record;
         var _Client = '';
@@ -76,30 +72,19 @@ var Forms = React.createClass({
             />;
         }
         var account = [];
-        if(record.id && record.id.length > 0){
-            account = <FormItem
+        account.push(
+            <FormItem
                 id="accountName"
                 label="账号"
                 labelCol={{ span: 6 }}
                 wrapperCol={{ span: 14 }}
                 key="accountName"
-                validateStatus={validateStatus.accountName}
+                validateStatus={validateStatus.accountName ? validateStatus.accountName : validateStatus.accountId}
             >
-                <Input value={record.accountName} name="accountName" disabled/>
+                <Input value={record.accountName} name="accountName" onChange={this.props.handleChange} onBlur={this.props.handleBlur}/>
             </FormItem>
-        } else if(record.rechargeType == 0){
-            account.push(
-                <FormItem
-                    id="accountName"
-                    label="账号"
-                    labelCol={{ span: 6 }}
-                    wrapperCol={{ span: 14 }}
-                    key="accountName"
-                    validateStatus={validateStatus.accountName}
-                >
-                    <Input value={record.accountName} name="accountName" onChange={this.props.handleChange}/>
-                </FormItem>
-            )
+        );
+        if(record.rechargeType == 0){
             account.push(
                 <FormItem
                     id="accountPwd"
@@ -111,19 +96,8 @@ var Forms = React.createClass({
                     <Input value={record.accountPwd} name="accountPwd" onChange={this.props.handleChange}/>
                 </FormItem>
             )
-        }else if(record.rechargeType == 1){
-            account = <FormItem
-                id="accountName"
-                label="账号"
-                labelCol={{ span: 6 }}
-                wrapperCol={{ span: 14 }}
-                validateStatus={validateStatus.accountId}
-            >
-                <Select value={record.accountId} placeholder="请完善其他信息" notFoundContent="没有匹配项" onChange={this.props.handleSelectChange.bind(null,"accountId")} name="accountId">
-                    {accountOptions}
-                </Select>
-            </FormItem>;
         }
+
 
         return <div>{_Client}
             <Modal ref="modal"
@@ -147,13 +121,13 @@ var Forms = React.createClass({
                     <Input value={record.orderNo} name="orderNo" disabled={true}/>
                 </FormItem>
                 <FormItem
-                    id="clientName"
-                    label="客户名称"
+                    id="orderDate"
+                    label="订单日期"
                     labelCol={{ span: 6 }}
                     wrapperCol={{ span: 14 }}
-                    validateStatus={validateStatus.clientName}
+
                 >
-                        <Input value={record.clientName} name="clientName" readOnly={true} onClick={this.findClients}/>
+                    <Input type="date" value={record.orderDate} name="orderDate"  onChange={this.props.handleChange}/>
                 </FormItem>
                 <FormItem
                     id="rechargeType"
@@ -167,6 +141,7 @@ var Forms = React.createClass({
                         <RadioButton value={1}>续充</RadioButton>
                     </RadioGroup>
                 </FormItem>
+                {account}
                 <FormItem
                     id="gameName"
                     label="游戏名"
@@ -176,20 +151,23 @@ var Forms = React.createClass({
                     help={validateStatus.gameMsg}
                 >
                     <input style={{display:'none'}} />
-                    <Select
-                        combobox
-                        value={record.gameName}
-                        placeholder="请输入游戏名称"
-                        notFoundContent="没有匹配项"
-                        defaultActiveFirstOption={false}
-                        showArrow={false}
-                        filterOption={false}
-                        onChange={this.props.handleGameChange.bind(null,"game")}
-                        onSelect={this.props.handleGameSelectChange.bind(null,"game")}
-                        style={{width:'100%'}}
-                    >
-                        {gameOptions}
-                    </Select>
+                    {
+                        record.rechargeType == 1?<Input value={record.gameName}  disabled /> : <Select
+                            combobox
+                            value={record.gameName}
+                            placeholder="请输入游戏名称"
+                            notFoundContent="没有匹配项"
+                            defaultActiveFirstOption={false}
+                            showArrow={false}
+                            filterOption={false}
+                            onChange={this.props.handleGameChange.bind(null,"game")}
+                            onSelect={this.props.handleGameSelectChange.bind(null,"game")}
+                            style={{width:'100%'}}
+                        >
+                            {gameOptions}
+                        </Select>
+                    }
+
                 </FormItem>
                 <FormItem
                     id="platformName"
@@ -200,22 +178,33 @@ var Forms = React.createClass({
                     help={validateStatus.platformMsg}
                 >
                     <input style={{display:'none'}} />
-                    <Select
-                        combobox
-                        value={record.platformName}
-                        placeholder="请输入平台名称"
-                        notFoundContent="没有匹配项"
-                        defaultActiveFirstOption={false}
-                        showArrow={false}
-                        filterOption={false}
-                        onChange={this.props.handleGameChange.bind(null,"platform")}
-                        onSelect={this.props.handleGameSelectChange.bind(null,"platform")}
-                        style={{width:'100%'}}
-                    >
-                        {platformOptions}
-                    </Select>
+                    {
+                        record.rechargeType == 1?<Input value={record.platformName} disabled /> : <Select
+                            combobox
+                            value={record.platformName}
+                            placeholder="请输入平台名称"
+                            notFoundContent="没有匹配项"
+                            defaultActiveFirstOption={false}
+                            showArrow={false}
+                            filterOption={false}
+                            onChange={this.props.handleGameChange.bind(null,"platform")}
+                            onSelect={this.props.handleGameSelectChange.bind(null,"platform")}
+                            style={{width:'100%'}}
+                        >
+                            {platformOptions}
+                        </Select>
+                    }
+
                 </FormItem>
-                {account}
+                <FormItem
+                    id="clientName"
+                    label="客户名称"
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 14 }}
+                    validateStatus={validateStatus.clientName}
+                >
+                    <Input value={record.clientName} name="clientName" readOnly={true} onClick={this.findClients}/>
+                </FormItem>
                 <FormItem
                     id="point"
                     label="折扣"
@@ -223,7 +212,7 @@ var Forms = React.createClass({
                     wrapperCol={{ span: 14 }}
                     validateStatus={validateStatus.point}
                 >
-                    <Input type="number" value={record.point} name="point" onChange={this.props.handleChange}/>
+                    <Input type="number" step="0.1" value={record.point} name="point" onChange={this.props.handleChange}/>
                 </FormItem>
                 <FormItem
                     id="realPoint"
@@ -290,11 +279,14 @@ var Forms = React.createClass({
                 </FormItem>
                 <FormItem
                     id="clientBelong"
-                    label="客户归属人"
+                    label="账户归属人"
                     labelCol={{ span: 6 }}
                     wrapperCol={{ span: 14 }}
                 >
-                    <Input value={record.clientBelong} name="clientBelong"  disabled={true}/>
+                    {record.rechargeType == 1?<Input value={record.clientBelong} name="clientBelong"  disabled={true}/>:
+                    <Select value={record.clientBelongId ? record.clientBelongId.toString():''}  onChange={this.props.handleSelectChange.bind(null,"clientBelongId")} name="clientBelongId">
+                        {userOptions}
+                    </Select>}
                 </FormItem>
                 <FormItem
                     id="status"

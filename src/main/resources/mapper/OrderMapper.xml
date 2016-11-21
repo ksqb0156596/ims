@@ -4,23 +4,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shouyou.ims.dao.OrderDao">
     <sql id="BaseSQL">
-        o.id,o.order_no,o.client_id,o.game_id,o.platform_id,o.account_id,
---         o.pay_id,
+        o.id,o.order_no,o.client_id,o.game_id,o.platform_id,o.account_id,o.order_date,
         o.trading_id,o.director_id,o.profit,
         o.production_price,o.trading_price,o.recharge_type,o.denomination,
-        c.name as clientName,g.name as gameName,p.name as platformName,a.name as accountName,
---         pw.name as payName,
+        c.name as clientName,g.name as gameName,p.name as platformName,a.name as accountName,a.user_id as clientBelongId,
         tr.name as tradingName,db.name as directorName,d.name as clientBelong,dis.point,dis.real_point,l.name as levelName,
         o.status,o.remark,o.update_date,o.insert_date,u1.name as updateUser,u2.name as insertUser
         FROM orders o
         LEFT JOIN clients c ON c.id = o.client_id
         LEFT JOIN levels l ON l.id = c.level_id
-        LEFT JOIN users d ON d.id = c.user_id
         LEFT JOIN users db ON db.id = o.director_id
         LEFT JOIN game g ON o.game_id = o.game_id
         LEFT JOIN game_platform p ON o.platform_id = p.id
         LEFT JOIN accounts a ON o.account_id = a.id
---         LEFT JOIN pay_way pw ON o.pay_id = pw.id
+        LEFT JOIN users d ON d.id = a.user_id
         LEFT JOIN trading_route tr ON o.trading_id = tr.id
         LEFT JOIN discount dis ON dis.platform_id = o.platform_id AND dis.game_id = o.game_id
         LEFT JOIN users u1 on o.update_user = u1.id
@@ -29,7 +26,7 @@
     </sql>
 
     <select id="findByOrderNo" resultType="Order">
-        SELECT  o.id,o.order_no,o.client_id,o.game_id,o.platform_id,o.account_id,
+        SELECT  o.id,o.order_no,o.client_id,o.game_id,o.platform_id,o.account_id,o.order_date,
         o.trading_id,o.director_id,o.profit,
         o.production_price,o.trading_price,o.recharge_type,o.denomination,
          o.status,o.remark,o.update_date,o.insert_date
@@ -55,7 +52,7 @@
                 AND g.name LIKE CONCAT('%',#{gameName},'%')
             </if>
             <if test="platformName!=null and platformName!=''">
-                AND p.name = LIKE CONCAT('%',#{platformName},'%')
+                AND p.name LIKE CONCAT('%',#{platformName},'%')
             </if>
             <if test="accountName!=null and accountName!=''">
                 AND a.name = #{accountName}
@@ -101,16 +98,40 @@
             </if>
         </where>
         GROUP BY o.id
+        ORDER BY o.order_date DESC
     </select>
     
     <insert id="insert">
         INSERT INTO orders 
-        (id,order_no,client_id,game_id,platform_id,account_id,pay_id,trading_id,director_id,status,denomination,
+        (id,order_no,client_id,game_id,platform_id,account_id,pay_id,trading_id,director_id,status,denomination,order_date,
             production_price,trading_price,profit,recharge_type,remark,update_date,insert_date,insert_user,update_user)
             VALUES
-        (#{id},#{orderNo},#{clientId},#{gameId},#{platformId},#{accountId},#{payId},#{tradingId},#{directorId},#{status},#{denomination},
+        (#{id},#{orderNo},#{clientId},#{gameId},#{platformId},#{accountId},#{payId},#{tradingId},#{directorId},#{status},#{denomination},#{orderDate},
             #{productionPrice},#{tradingPrice},#{profit},#{rechargeType},#{remark},#{updateDate},#{insertDate},#{insertUser},#{updateUser})
     </insert>
+
+    <insert id="insertBatch">
+        INSERT INTO orders
+        (id,order_no,client_id,game_id,platform_id,account_id,pay_id,trading_id,director_id,status,denomination,order_date,
+        production_price,trading_price,profit,recharge_type,remark,update_date,insert_date,insert_user,update_user)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.orderNo},#{item.clientId},#{item.gameId},#{item.platformId},#{item.accountId},#{item.payId},#{item.tradingId},#{item.directorId},#{item.status},#{item.denomination},#{item.orderDate},
+            #{item.productionPrice},#{item.tradingPrice},#{item.profit},#{item.rechargeType},#{item.remark},#{item.updateDate},#{item.insertDate},#{item.insertUser},#{item.updateUser})
+        </foreach>
+        
+    </insert>
+
+    <update id="updateBatch">
+        REPLACE INTO orders
+        (id,order_no,client_id,game_id,platform_id,account_id,pay_id,trading_id,director_id,status,denomination,order_date,
+        production_price,trading_price,profit,recharge_type,remark,update_date,insert_date,insert_user,update_user)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.orderNo},#{item.clientId},#{item.gameId},#{item.platformId},#{item.accountId},#{item.payId},#{item.tradingId},#{item.directorId},#{item.status},#{item.denomination},#{item.orderDate},
+            #{item.productionPrice},#{item.tradingPrice},#{item.profit},#{item.rechargeType},#{item.remark},#{item.updateDate},#{item.insertDate},#{item.insertUser},#{item.updateUser})
+        </foreach>
+    </update>
 
     <update id="update">
         UPDATE orders SET
@@ -122,6 +143,7 @@
           production_price = #{productionPrice},
           trading_price = #{tradingPrice},
           profit = #{profit},
+          order_date = #{orderDate},
           recharge_type = #{rechargeType},
           update_date = #{updateDate},
           update_user = #{updateUser}
@@ -129,7 +151,7 @@
           id = #{id}
     </update>
 
-    <update id="delete" parameterType="java.lang.String">
-        UPDATE orders SET status = 9999 WHERE id=#{id}
-    </update>
+    <delete id="delete" parameterType="java.lang.String">
+        DELETE  FROM orders WHERE id=#{id}
+    </delete>
 </mapper>

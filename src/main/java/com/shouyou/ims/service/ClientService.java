@@ -32,9 +32,12 @@ public class ClientService {
     public ResultBo<Client> save(Client client){
 
         if(StringUtils.isEmpty(client.getId())){
-            Client c = this.checkRepeat(client);
-            if(c!=null){
-                return new ResultBo(0,c);
+            List<Client> clientList = this.checkRepeat(client);
+            if(clientList.size() > 0){
+                if(clientList.size() > 1){
+                    return new ResultBo(2,"存在相同的用户信息");
+                }
+                return new ResultBo(0,clientList.get(0));
             }
             client.preInsert();
             client.setUserId(UserUtils.getUser().getId());
@@ -59,7 +62,7 @@ public class ClientService {
         return clientDao.deleteMul(ids, UserUtils.getUser().getId());
     }
 
-    public Client checkRepeat(Client client){
+    public List<Client> checkRepeat(Client client){
         return clientDao.queryRepeat(client);
     }
 

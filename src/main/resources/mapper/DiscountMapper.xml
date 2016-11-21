@@ -18,11 +18,11 @@
         LEFT JOIN users u2 on d.insert_user = u2.id
         <where>
             d.status = 1
-            <if test="platformId != null">
-                AND d.platform_id = #{platformId}
+            <if test="platformName != null">
+                AND p.name = #{platformName}
             </if>
-            <if test="gameId != null">
-                AND d.gamg_id = #{gameId}
+            <if test="gameName != null">
+                AND g.name = #{gameName}
             </if>
             <if test="rechargeType != null">
                 AND d.recharge_type = #{rechargeType}

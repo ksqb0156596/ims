@@ -32,6 +32,10 @@ public class DiscountService {
         if(!StringUtils.isEmpty(discount.getId())){
             this.delete(discount.getId());
         }
+        Discount temp = queryDiscount(discount);
+        if(temp != null){
+            this.delete(temp.getId());
+        }
         discount.preInsert();
         return discountDao.insert(discount);
     }

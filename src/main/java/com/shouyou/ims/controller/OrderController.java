@@ -26,6 +26,13 @@ public class OrderController {
         return new ResultBo(1,orderService.findList(order)).toString();
     }
 
+
+    @RequestMapping(value = "/export",method = RequestMethod.GET)
+    public String export(Order order){
+        orderService.exportOrder(order);
+        return null;
+    }
+
     @RequestMapping(value = "/findById")
     public String findById(@RequestParam(value = "id") String id){
         return new ResultBo(1,orderService.findById(id)).toString();
@@ -38,8 +45,8 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/delete")
-    public String delete(Order order){
-        return new ResultBo(orderService.delete(order)).toString();
+    public String delete(String id){
+        return new ResultBo(orderService.delete(id)).toString();
     }
 
     @RequestMapping(value = "/upload",method = RequestMethod.POST)

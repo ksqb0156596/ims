@@ -21,6 +21,24 @@ public class OrderExcelBo {
     private String accountName;
     private String accountPwd;
     private String tradingPrice;
+    private String orderDate;
+    private String clientName;
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
+    }
 
     public String getTradingPrice() {
         return tradingPrice;

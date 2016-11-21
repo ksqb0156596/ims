@@ -20,6 +20,7 @@ var Platform = require('./components/game/platform');
 var Trading = require('./components/finance/trading');
 var Discount = require('./components/finance/discount');
 var Account = require('./components/client/account');
+var Statistics = require('./components/finance/statistics');
 ReactDom.render(
     <Router history={browserHistory}>
         <Route  path="/" component={App} >
@@ -34,5 +35,6 @@ ReactDom.render(
             <Route path="trading" component={Trading}></Route>
             <Route path="discount" component={Discount}></Route>
             <Route path="account" component={Account}></Route>
+            <Route path="statistics" component={Statistics}></Route>
         </Route>
     </Router>,document.getElementById('wrapper'));

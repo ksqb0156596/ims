@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Mapper
 public interface ClientDao extends BaseDao<Client>{
-    Client queryRepeat(Client client);
+    List<Client> queryRepeat(Client client);
     List<Client> findListCon(@Param("condition") String condition);
     int updatePrice(Client client);
 }

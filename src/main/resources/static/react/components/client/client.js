@@ -27,13 +27,7 @@ var Menus = React.createClass({
             method:"GET",
             data:{pageSize:0}
         }).then(function (data) {
-            Api.request({
-                url : Url.FIND_USER_LIST,
-                method : "GET",
-                data : {pageNum:1,pageSize:0}
-            }).then(function (data1) {
-                this.setState({levels:data.result.list,users:data1.result.list})
-            }.bind(this))
+            this.setState({levels:data.result.list})
         }.bind(this))
     },
     getInitialState : function(){
@@ -42,11 +36,11 @@ var Menus = React.createClass({
             visible: false,
             record : {},
             levels : [],
+            total:0,
             pageNum:1,
             pageSize:20,
             searchModal : {status:1},
             selectedRows : [],
-            users : []
         }
     },
     findList : function(current,pageSize){
@@ -55,7 +49,7 @@ var Menus = React.createClass({
             url : Url.FIND_CLIENT_LIST,
             data : _.extend({pageNum:current,pageSize:pageSize},this.state.searchModal)
         }).then(function (data) {
-            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list});
+            this.setState({pageNum : current,pageSize : pageSize,menus:data.result.list,total:data.result.total});
             message.destroy();
         }.bind(this))
     },
@@ -107,12 +101,6 @@ var Menus = React.createClass({
                 width:'120px'
             },
             {
-                title : "归属员工",
-                dataIndex : "userName",
-                key : "userName",
-                width:'120px'
-            },
-            {
                 title : "更新人",
                 dataIndex : "updateUser",
                 key : "updateUser",
@@ -143,8 +131,10 @@ var Menus = React.createClass({
 
         ];
         var pagination = {
-            total: this.state.menus.length,
-            showSizeChanger: true,pageSize : this.state.pageSize,
+            total: this.state.total,
+            pageSize : this.state.pageSize,
+            current : this.state.pageNum,
+            showSizeChanger: true,
             onShowSizeChange : function(current, pageSize) {
                 this.findList(current,pageSize);
 
@@ -161,12 +151,6 @@ var Menus = React.createClass({
         var record = this.state.record;
         var _Modal = '';
         if(this.state.visible){
-            var options = [];
-            var users = this.state.users;
-            for(var i in users){
-                var _user = users[i];
-                options.push(<Option key={_user.id} value={_user.id}>{_user.name}</Option>);
-            }
             _Modal = <Modal ref="modal"
                             visible={this.state.visible}
                             title="编辑用户" onOk={this.handleOk} onCancel={this.handleCancel}
@@ -209,16 +193,7 @@ var Menus = React.createClass({
                             <Input value={record.qq} id="qq" onChange={this._handleChange}/>
                         </div>
                     </div>
-                    <div className="row">
-                        <div className="col-xs-4">
-                            归属员工
-                        </div>
-                        <div className="col-xs-8">
-                            <Select style={{width:'100%'}} value={record.userId} onChange={this._handleSelectChange.bind(null,"userId")}>
-                                {options}
-                            </Select>
-                        </div>
-                    </div>
+                    
                     <div className="row">
                         <div className="col-xs-4">
                             客户状态
@@ -433,15 +408,6 @@ var SearchForm = React.createClass({
                 </Col>
                 <Col sm={8}>
                     <FormItem
-                        label="归属员工"
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 14 }}
-                    >
-                        <Input placeholder="请输入归属员工" size="default" id="search_userName" value={searchModal.userName} onChange={this.props.handleChange}/>
-                    </FormItem>
-                </Col>
-                <Col sm={8}>
-                    <FormItem
                         label="等级"
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 14 }}
@@ -453,7 +419,7 @@ var SearchForm = React.createClass({
                 </Col>
                 <Col sm={8}>
                     <FormItem
-                        label="等级"
+                        label="用户状态"
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 14 }}
                     >

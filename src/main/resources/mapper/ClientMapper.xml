@@ -17,7 +17,7 @@
       FROM  clients c
       LEFT JOIN users u1 ON u1.id = c.user_id
       WHERE c.status =1 AND (c.ali_wang = #{condition} OR c.wechat = #{condition}
-      OR c.phone = #{condition} OR c.qq = #{condition})
+      OR c.phone = #{condition} OR c.qq = #{condition} OR c.name = #{condition})
     </select>
 
     <select id="queryRepeat" resultType="Client">
