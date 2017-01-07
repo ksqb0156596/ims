@@ -14,7 +14,7 @@
         LEFT JOIN clients c ON c.id = o.client_id
         LEFT JOIN levels l ON l.id = c.level_id
         LEFT JOIN users db ON db.id = o.director_id
-        LEFT JOIN game g ON o.game_id = o.game_id
+        LEFT JOIN game g ON g.id = o.game_id
         LEFT JOIN game_platform p ON o.platform_id = p.id
         LEFT JOIN accounts a ON o.account_id = a.id
         LEFT JOIN users d ON d.id = a.user_id
@@ -59,6 +59,9 @@
             </if>
             <if test="tradingId!=null and tradingId!=''">
                 AND o.trading_id = #{tradingId}
+            </if>
+            <if test="startDate != null and endDate!=null">
+                AND o.order_date &lt;= #{endDate} AND o.order_date &gt;= #{startDate}
             </if>
             <if test="denomination!=null">
                 AND o.denomination = #{denomination}

@@ -8,6 +8,9 @@ import { Select } from 'antd';
 import { message } from 'antd';
 import { Form, Row, Col } from 'antd';
 import { Radio } from 'antd';
+import { DatePicker } from 'antd';
+import moment from 'moment';
+const {  RangePicker } = DatePicker;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -25,6 +28,16 @@ var SearchForm = React.createClass({
         var userOptions = [];
         for(var i in users){
             userOptions.push(<Option key={users[i].id} value={users[i].id}>{users[i].name}</Option>)
+        }
+        var dateFormat = "YYYY-MM-DD";
+        var startDate;
+        var endDate;
+        var dateFlag = false;
+        if(record.startDate && record.startDate.length > 0
+        && record.endDate && record.endDate.length > 0 ){
+            startDate = moment(record.startDate,dateFormat);
+            endDate = moment(record.endDate,dateFormat);
+            dateFlag = true;
         }
         return  <Form horizontal  className="ant-advanced-search-form">
             <Row type="flex">
@@ -190,6 +203,22 @@ var SearchForm = React.createClass({
                         </Select>
                     </FormItem>
                 </Col>
+                <Col sm={8}>
+                    <FormItem
+                        label="订单日期"
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 14 }}
+                    >
+
+                        {dateFlag ? <RangePicker
+                            onChange={this.handleDateChange}
+                            value={[startDate, endDate]}
+                        />:<RangePicker
+                            onChange={this.handleDateChange}
+                            value={[null, null]}
+                        />}
+                    </FormItem>
+                </Col>
             </Row>
             <Row>
                 <Col span={12} offset={12} style={{ textAlign: 'right' }}>
@@ -209,6 +238,12 @@ var SearchForm = React.createClass({
     handleSelectChange : function (name,value) {
         var record = this.state.record;
         record[name] = value;
+        this.setState({record:record});
+    },
+    handleDateChange : function (date, dateString) {
+        var record = this.state.record;
+        record.startDate = dateString[0];
+        record.endDate = dateString[1];
         this.setState({record:record});
     },
     clear : function () {
