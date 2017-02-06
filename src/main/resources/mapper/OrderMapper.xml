@@ -9,7 +9,7 @@
         o.production_price,o.trading_price,o.recharge_type,o.denomination,
         c.name as clientName,g.name as gameName,p.name as platformName,a.name as accountName,a.user_id as clientBelongId,
         tr.name as tradingName,db.name as directorName,d.name as clientBelong,dis.point,dis.real_point,l.name as levelName,
-        o.status,o.remark,o.update_date,o.insert_date,u1.name as updateUser,u2.name as insertUser
+        o.status,o.remark,o.update_date,o.insert_date,u1.name as updateUser,u2.name as insertUser,o.insert_user as createUserId
         FROM orders o
         LEFT JOIN clients c ON c.id = o.client_id
         LEFT JOIN levels l ON l.id = c.level_id

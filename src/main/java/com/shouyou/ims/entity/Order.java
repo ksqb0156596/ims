@@ -43,6 +43,15 @@ public class Order extends BaseEntity implements Serializable {
     private String orderDate;
     private String startDate;
     private String endDate;
+    private String createUserId;
+
+    public String getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
 
     public String getStartDate() {
         return startDate;

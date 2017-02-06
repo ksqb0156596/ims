@@ -542,6 +542,14 @@ var Menus = React.createClass({
             url : Url.SAVE_ORDER,
             data : record
         }).then(function(data){
+            if(data.status == 9000){
+                swal({
+                    title : "不能修改其他人的订单",
+                    text : "不能修改其他人的订单",
+                    type : "error"
+                });
+                return;
+            }
             this.setState({visible:false,loading:false});
             this.findList(this.state.pageNum,this.state.pageSize);
         }.bind(this))

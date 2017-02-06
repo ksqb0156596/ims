@@ -104,6 +104,9 @@ public class OrderService {
                 return this.insert(order);
             }else{
                 Order order1 = orderDao.findById(order.getId());
+                if(!order1.getCreateUserId().equals(UserUtils.getUser().getId()) && !"admin".equals(UserUtils.getUser().getId())){//除了admin其他用户不能修改别人的订单信息
+                    return 9000;
+                }
                 if(client != null) {//历史数据
                     int plus = order.getTradingPrice().subtract(order1.getTradingPrice()).intValue();
                     int totalMoney;
