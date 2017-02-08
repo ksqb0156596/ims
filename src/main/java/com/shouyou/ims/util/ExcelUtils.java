@@ -91,12 +91,19 @@ public class ExcelUtils {
                     Field field = clazz.getDeclaredField(colRow.getCell(j).getStringCellValue());
                     PropertyDescriptor pd = new PropertyDescriptor(field.getName(), clazz);
                     Method method = pd.getReadMethod();
-                    cell.setCellValue(String.valueOf(method.invoke(obj)));
+                    String cellStr = String.valueOf(method.invoke(obj));
+                    try{
+                        cell.setCellValue(Double.parseDouble(cellStr));
+                    }catch (Exception e){
+                        cell.setCellValue(cellStr);
+                    }
+
                 }
             }
 
             OutputStream outputStream = response.getOutputStream();
             workbook.write(outputStream);
+            outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();

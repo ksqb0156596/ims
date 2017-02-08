@@ -7,7 +7,6 @@ var Router = require('react-router').Router;
 var Route = require('react-router').Route;
 var Link = require('react-router').Link;
 var browserHistory = require('react-router').hashHistory;
-var IndexRoute = require('react-router').IndexRoute;
 var IndexRedirect = require('react-router').IndexRedirect;
 var App = require('./components/app');
 var Order = require('./components/order/order');

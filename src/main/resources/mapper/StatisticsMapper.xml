@@ -15,8 +15,12 @@
         </if>
 
         FROM orders o
+        <if test='userId != "admin" '>
+            INNER JOIN accounts a1 ON o.account_id = a1.id
+            INNER JOIN users d ON d.id = a1.user_id AND d.id = #{userId}
+        </if>
         <if test="tableName!=null">
-            LEFT JOIN ${tableName} a ON a.id = o.${tableId}
+            INNER JOIN ${tableName} a ON a.id = o.${tableId}
         </if>
         <where>
             o.status IN (1,2,3,4,5)
@@ -40,8 +44,12 @@
         SUM(o.profit) as profit,SUM(denomination) as denomination,u.name
 
         FROM orders o
-            LEFT JOIN accounts a ON o.account_id = a.id
-            LEFT JOIN users u ON u.id = a.user_id
+        INNER JOIN accounts a1 ON o.account_id = a1.id
+        INNER JOIN users u ON u.id = a1.user_id
+        <if test='userId != "admin"'>
+            AND u.id = #{userId}
+        </if>
+
         <where>
             o.status IN (1,2,3,4,5)
             <if test="name!=null and name!=''">
@@ -61,6 +69,10 @@
         FROM (
             SELECT COUNT(o.client_id)
             FROM orders o
+            <if test="userId != 'admin'.toString() ">
+                INNER JOIN accounts a1 ON o.account_id = a1.id
+                INNER JOIN users d ON d.id = a1.user_id AND d.id = #{userId}
+            </if>
             <where>
                 o.status IN (1,2,3,4,5)
                 <if test="startDate!=null and endDate!=null and startDate!='' and endDate!=''">
@@ -76,6 +88,10 @@
         SELECT count(0) FROM
         (SELECT COUNT(o.account_id)
         FROM orders o
+        <if test="userId != 'admin'.toString() ">
+            INNER JOIN accounts a1 ON o.account_id = a1.id
+            INNER JOIN users d ON d.id = a1.user_id AND d.id = #{userId}
+        </if>
         <where>
             o.status IN (1,2,3,4,5)
             <if test="startDate!=null and endDate!=null and startDate!='' and endDate!=''">

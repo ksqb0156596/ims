@@ -11,6 +11,7 @@ public class Statistics {
     private String name;
     private String startDate;
     private String endDate;
+    private String userId;
     public Statistics(){
 
     }
@@ -20,6 +21,13 @@ public class Statistics {
         this.endDate = statisticsBo.getEndDate();
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getTableId() {
         return tableId;

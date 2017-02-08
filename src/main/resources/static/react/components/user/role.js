@@ -205,13 +205,14 @@ var Role = React.createClass({
                 method : "GET",
                 data : {roleId:roleId}
             }).then(function(data1){
-                this.setState({roleVisible:true,roleLoading:false,resources:data,defaultCheckedKeys:data1.result,roleId:roleId})
+                this.setState({roleVisible:true,roleLoading:false,resources:data,defaultCheckedKeys:data1.result,roleId:roleId,targetKeys:data1.result})
                 // this.setState({roleVisible:true,roleLoading:false,roles:_roles,targetKeys:[1]})
             }.bind(this))
         }.bind(this))
 
     },
-    _handleRoleChange : function (targetKeys, direction, moveKeys) {
+    _handleRoleChange : function (targetKeys, e) {
+        targetKeys = _.union(targetKeys,e.halfCheckedKeys);
         this.setState({ targetKeys:targetKeys });
     },
     handleRoleOk : function () {

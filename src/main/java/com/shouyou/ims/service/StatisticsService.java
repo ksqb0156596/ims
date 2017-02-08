@@ -3,6 +3,7 @@ package com.shouyou.ims.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.shouyou.ims.bo.StatisticsBo;
+import com.shouyou.ims.commons.UserUtils;
 import com.shouyou.ims.dao.StatisticsDao;
 import com.shouyou.ims.entity.Statistics;
 import com.shouyou.ims.entity.StatisticsAll;
@@ -23,6 +24,7 @@ public class StatisticsService {
 
     public PageInfo<StatisticsResult> statistics(StatisticsBo statisticsBo){
         Statistics statistics = new Statistics(statisticsBo);
+        statistics.setUserId(UserUtils.getUser().getId());
         switch (statisticsBo.getKey()){
             case "account" : statistics.setTableId("account_id");statistics.setTableName("accounts");break;
             case "client" : statistics.setTableId("client_id");statistics.setTableName("clients");break;
@@ -43,6 +45,7 @@ public class StatisticsService {
         StatisticsAll statisticsAll = new StatisticsAll();
         Statistics statistics = new Statistics(statisticsBo);
         statistics.setName(null);
+        statistics.setUserId(UserUtils.getUser().getId());
         List<StatisticsResult> list = statisticsDao.queryStatistics(statistics);
         if(list.size() > 0){
             StatisticsResult statisticsResult = list.get(0);

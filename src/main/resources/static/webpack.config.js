@@ -6,7 +6,20 @@ var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('common.js');
 
 module.exports = {
     //插件
-    plugins:[commonsPlugin],
+    plugins:[commonsPlugin,
+        new webpack.DefinePlugin({ // <-- 减少 React 大小的关键
+            'process.env': {
+                'NODE_ENV': JSON.stringify('production')
+            }
+        }),
+      new webpack.optimize.DedupePlugin(), //删除类似的重复代码
+      new webpack.optimize.UglifyJsPlugin({
+          compress: {
+              warnings: false
+          }
+      }), //最小化一切
+      new webpack.optimize.AggressiveMergingPlugin()//合并块
+    ],
     //页面入口
     entry:{
         main:'./react/router.js'
